@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Console | MyLinkShortener</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --dark: #0f172a; --card-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { background: var(--bg); color: var(--dark); min-height: 100vh; padding-bottom: 80px; }
+
+        /* Mobile Friendly Header */
+        .header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; sticky: top; z-index: 10; }
+        .logo { font-size: 1.2rem; font-weight: 800; color: var(--primary); text-decoration: none; }
+        .user-badge { background: #eff6ff; padding: 6px 12px; border-radius: 50px; display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: var(--primary); }
+
+        /* Dashboard Container */
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+
+        /* Premium Input Card */
+        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: var(--card-shadow); border: 1px solid #f1f5f9; margin-bottom: 20px; }
+        h2 { font-size: 1.3rem; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .sub-text { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+
+        .input-group { position: relative; }
+        input { width: 100%; padding: 16px; border-radius: 12px; border: 2px solid #f1f5f9; background: #f8fafc; font-size: 1rem; outline: none; transition: 0.3s; margin-bottom: 12px; }
+        input:focus { border-color: var(--primary); background: white; }
+        
+        .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-2px); }
+
+        /* Recent Assets Table (Scrollable on Mobile) */
+        .assets-title { font-weight: 800; font-size: 1.1rem; margin: 30px 0 15px; display: flex; align-items: center; gap: 8px; }
+        .table-wrapper { overflow-x: auto; background: white; border-radius: 16px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; min-width: 400px; }
+        th { text-align: left; padding: 12px 15px; background: #f8fafc; color: #64748b; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 15px; font-size: 0.9rem; border-bottom: 1px solid #f8fafc; }
+        .click-badge { background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+
+        /* Footer Fixed Navigation */
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #e2e8f0; padding: 15px; display: flex; justify-content: space-around; font-size: 0.8rem; font-weight: 700; color: #64748b; }
+        .footer-nav a { text-decoration: none; color: inherit; cursor: pointer; }
+        .footer-nav a:hover { color: var(--primary); }
+
+        .btn-logout { color: #ef4444 !important; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="#" class="logo">MyLinkShortener</a>
+        <div class="user-badge">
+            <div id="uInit" style="background:var(--primary); color:white; width:20px; height:20px; border-radius:50%; text-align:center; line-height:20px;">?</div>
+            <span id="uName">Developer</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Create Encrypted Link</h2>
+            <p class="sub-text">Assets are stored in your private developer instance.</p>
+            <div class="input-group">
+                <input type="text" id="longUrl" placeholder="https://vansh.com/project-file">
+                <button class="btn-primary" id="shortenBtn">Generate Short Link</button>
+            </div>
+        </div>
+
+        <div class="assets-title">Recent Assets <span style="font-size:0.7rem; background:#cbd5e1; padding:2px 8px; border-radius:10px;">Private</span></div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Path</th>
+                        <th>Clicks</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="linksBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="footer-nav">
+        <a onclick="showInfo('Security', 'Your links are end-to-end encrypted on Firebase.')">Security</a>
+        <a onclick="showInfo('Terms', 'Authorized developer use only.')">Terms</a>
+        <a onclick="showInfo('Contact', 'Support: support@vansh.github.io')">Contact</a>
+        <a id="logoutBtn" class="btn-logout">Logout</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZ377dS4bKlcZDZm5FqoiFEFYoQC9jb2Q",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUser = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('uName').innerText = user.email.split('@')[0];
+                document.getElementById('uInit').innerText = user.email.charAt(0).toUpperCase();
+                loadData();
+            } else { window.location.href = "index.html"; }
+        });
+
+        document.getElementById('shortenBtn').onclick = async () => {
+            const longUrl = document.getElementById('longUrl').value;
+            if(!longUrl) return Swal.fire('Error', 'Paste a URL!', 'error');
+            const shortId = Math.random().toString(36).substring(7);
+            await addDoc(collection(db, "links"), {
+                userId: currentUser.uid,
+                longUrl: longUrl,
+                shortId: shortId,
+                clicks: 0
+            });
+            document.getElementById('longUrl').value = "";
+            Swal.fire('Success', 'Short Link Generated!', 'success');
+        };
+
+        function loadData() {
+            const q = query(collection(db, "links"), where("userId", "==", currentUser.uid));
+            onSnapshot(q, (snaps) => {
+                const body = document.getElementById('linksBody');
+                body.innerHTML = "";
+                snaps.forEach(doc => {
+                    const d = doc.data();
+                    body.innerHTML += `<tr>
+                        <td style="color:var(--primary); font-weight:700;">/${d.shortId}</td>
+                        <td><span class="click-badge">${d.clicks}</span></td>
+                        <td style="color:#22c55e; font-weight:700;">Live</td>
+                    </tr>`;
+                });
+            });
+        }
+
+        window.showInfo = (t, m) => Swal.fire(t, m, 'info');
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
+    </script>
+</body>
+</html>
