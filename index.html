@@ -100,29 +100,25 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        
+        // Google Provider setup with auto-select
         const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
 
         let currentMode = 'login';
 
         window.switchTab = (mode) => {
             currentMode = mode;
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            if(mode === 'login') document.getElementById('loginTab').classList.add('active');
-            else document.getElementById('signupTab').classList.add('active');
-            
-            const title = document.getElementById('title');
-            const sub = document.getElementById('subtitle');
-            const btn = document.getElementById('submitBtn');
-
-            if(mode === 'signup') {
-                title.innerText = "Create Account";
-                sub.innerText = "Register and verify your developer workstation.";
-                btn.innerText = "Create Developer ID";
+            if(mode === 'login') {
+                document.getElementById('loginTab').classList.add('active');
             } else {
-                title.innerText = "Welcome Back";
-                sub.innerText = "Access your personal link management tools.";
-                btn.innerText = "Sign In";
+                document.getElementById('signupTab').classList.add('active');
             }
+            
+            document.getElementById('title').innerText = mode === 'signup' ? "Create Account" : "Welcome Back";
+            document.getElementById('subtitle').innerText = mode === 'signup' ? "Register and verify your developer workstation." : "Access your personal link management tools.";
+            document.getElementById('submitBtn').innerText = mode === 'signup' ? "Create Developer ID" : "Sign In";
         };
 
         const Toast = Swal.mixin({
@@ -133,43 +129,45 @@
             timerProgressBar: true
         });
 
-        // Google Login
+        // --- FIXED GOOGLE LOGIN ---
         document.getElementById('googleBtn').onclick = async () => {
             try {
                 const res = await signInWithPopup(auth, provider);
                 Toast.fire({ icon: 'success', title: 'Welcome ' + res.user.displayName });
                 setTimeout(() => window.location.href = "dashboard.html", 2000);
             } catch (e) {
-                Swal.fire('Error', 'Google login failed or domain not authorized.', 'error');
+                console.error("Google Auth Error:", e);
+                // Ab ye popup exact bataega ki problem kya hai
+                let errorMsg = e.message;
+                if(e.code === 'auth/unauthorized-domain') errorMsg = "Domain authorize nahi hai. Firebase settings check karein.";
+                if(e.code === 'auth/popup-closed-by-user') errorMsg = "Aapne login window band kar di.";
+                
+                Swal.fire('Auth Error', errorMsg, 'error');
             }
         };
 
-        // Email Login/Signup with Verification Logic
+        // --- FIXED EMAIL LOGIN/SIGNUP ---
         document.getElementById('submitBtn').onclick = async () => {
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value;
             
-            if(!email || !pass) return Swal.fire('Wait!', 'Email aur Password zaruri hai.', 'warning');
+            if(!email || !pass) return Swal.fire('Wait!', 'Email aur Password dono bhariye.', 'warning');
 
             try {
                 if(currentMode === 'signup') {
-                    // Create User
                     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                    // Send Verification Email
                     await sendEmailVerification(userCredential.user);
                     
                     Swal.fire({
                         icon: 'success',
                         title: 'Verify Your Email',
-                        text: 'Aapki email par ek verification link bheja gaya hai. Link par click karne ke baad hi aap login kar payenge.',
+                        text: 'Aapki email par link bhej diya gaya hai. Verify karne ke baad hi login hoga.',
                         confirmButtonColor: '#2563eb'
                     });
-                    switchTab('login'); // Registration ke baad login page par bhejein
+                    switchTab('login');
                 } else {
-                    // Login
                     const userCredential = await signInWithEmailAndPassword(auth, email, pass);
                     
-                    // Check if email is verified
                     if(userCredential.user.emailVerified) {
                         Toast.fire({ icon: 'success', title: 'Signed in successfully' });
                         setTimeout(() => window.location.href = "dashboard.html", 2000);
@@ -177,30 +175,31 @@
                         Swal.fire({
                             icon: 'warning',
                             title: 'Email Not Verified',
-                            text: 'Pehle apni email inbox check karein aur account verify karein.',
-                            footer: '<a href="#" onclick="resendEmail()">Link nahi mila? Resend karein</a>'
+                            text: 'Pehle apna Gmail inbox check karke verify karein.',
+                            footer: '<a href="#" id="resendLink">Resend Link</a>'
                         });
-                        auth.signOut(); // Verify nahi hai toh logout kar dein
+                        // Resend link logic
+                        document.getElementById('resendLink').onclick = () => resendEmail();
+                        auth.signOut();
                     }
                 }
             } catch (e) {
-                let msg = "Invalid Credentials or Network Issue.";
-                if(e.code === 'auth/email-already-in-use') msg = "Ye email pehle se register hai.";
-                if(e.code === 'auth/weak-password') msg = "Password kam se kam 6 characters ka hona chahiye.";
+                console.error("Auth Error:", e);
+                let msg = e.message;
+                if(e.code === 'auth/invalid-credential') msg = "Email ya Password galat hai.";
+                if(e.code === 'auth/user-not-found') msg = "User nahi mila.";
+                if(e.code === 'auth/wrong-password') msg = "Password galat hai.";
                 Swal.fire('Failed', msg, 'error');
             }
         };
 
-        // Resend Verification Functionality
         window.resendEmail = async () => {
             const user = auth.currentUser;
             if(user) {
                 await sendEmailVerification(user);
-                Swal.fire('Sent!', 'Verification link phir se bheja gaya hai.', 'success');
-            } else {
-                Swal.fire('Error', 'Pehle Sign up karein ya login detail bharein.', 'error');
+                Swal.fire('Sent!', 'Link phir se bheja gaya hai.', 'success');
             }
-        }
+        };
 
         window.showSupport = () => {
             Swal.fire({
@@ -211,4 +210,5 @@
         };
     </script>
 </body>
-</html>
+            </html>
+            
