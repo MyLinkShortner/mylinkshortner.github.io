@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 20px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .message {
+            color: #0f172a;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        .url-display {
+            color: #64748b;
+            font-size: 0.8rem;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+        .manual-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="spinner" id="spinner"></div>
+        <div class="message" id="message">Verifying link...</div>
+        <div class="url-display" id="urlDisplay"></div>
+        <a href="#" id="manualLink" class="manual-link" style="display: none;">Click here if not redirected</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABekPzR4zxlY8rws16hyYNmFlMXBcggXk",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function handleRedirect() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            
+            console.log("Looking for link ID:", id);
+            
+            if (!id) {
+                showError('Invalid Link', 'No link ID provided');
+                return;
+            }
+            
+            try {
+                // Method 1: Direct document lookup
+                const linkRef = doc(db, "links", id);
+                const linkSnap = await getDoc(linkRef);
+                
+                if (linkSnap.exists()) {
+                    const linkData = linkSnap.data();
+                    console.log("Link found via direct lookup:", linkData);
+                    await processLink(linkData, linkRef);
+                    return;
+                }
+                
+                // Method 2: Search by shortId field (fallback)
+                console.log("Trying to find by shortId field...");
+                const linksRef = collection(db, "links");
+                const q = query(linksRef, where("shortId", "==", id));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const docSnap = querySnapshot.docs[0];
+                    const linkData = docSnap.data();
+                    const linkRef2 = doc(db, "links", docSnap.id);
+                    console.log("Link found via shortId search:", linkData);
+                    await processLink(linkData, linkRef2);
+                    return;
+                }
+                
+                // No link found
+                console.log("Link not found in database");
+                showError('Link Not Found', 'This link does not exist or has been removed');
+                
+            } catch (error) {
+                console.error("Redirect error:", error);
+                showError('Error', error.message);
+            }
+        }
+        
+        async function processLink(linkData, linkRef) {
+            // Check if retracted
+            if (linkData.retracted === true) {
+                showError('Link Retracted', 'This link has been retracted by the owner');
+                return;
+            }
+            
+            // Check if expired
+            if (linkData.expiryDate && new Date(linkData.expiryDate) < new Date()) {
+                showError('Link Expired', 'This link has expired');
+                return;
+            }
+            
+            // Update click count
+            try {
+                await updateDoc(linkRef, {
+                    clicks: increment(1),
+                    lastClicked: new Date().toISOString()
+                });
+                console.log("Click count updated");
+            } catch (err) {
+                console.error("Click update error:", err);
+            }
+            
+            const targetUrl = linkData.longUrl;
+            const domain = new URL(targetUrl).hostname;
+            
+            // Update UI
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('message').innerHTML = `✓ Redirecting to ${domain}...`;
+            document.getElementById('urlDisplay').innerHTML = targetUrl;
+            
+            const manualLink = document.getElementById('manualLink');
+            manualLink.href = targetUrl;
+            manualLink.style.display = 'inline-block';
+            manualLink.innerHTML = `Go to ${domain}`;
+            
+            // Auto redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 2000);
+        }
+        
+        function showError(title, message) {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('message').innerHTML = title;
+            document.getElementById('urlDisplay').innerHTML = message;
+            document.getElementById('container').style.borderTop = '4px solid #ef4444';
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 3000);
+        }
+        
+        // Start
+        handleRedirect();
+    </script>
+</body>
+</html>
