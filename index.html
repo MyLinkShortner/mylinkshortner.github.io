@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyLinkShortener | Enterprise Link Management Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Navbar */
+        .navbar {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+        }
+
+        /* Auth Card */
+        .auth-card {
+            background: white;
+            border-radius: 40px;
+            width: 100%;
+            max-width: 500px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 60px;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s;
+            color: #64748b;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Headers */
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        /* Social Button */
+        .social-btn {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 60px;
+            background: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 60px);
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.85rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 60px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .auth-card {
+                padding: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .nav-badge {
+                padding: 5px 12px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <i class="fas fa-link"></i>
+            MyLinkShortener
+        </a>
+        <div class="nav-badge">
+            <i class="fas fa-shield-alt"></i> ENTERPRISE v4.0
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="auth-card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <button class="tab-btn" onclick="switchTab('signup')">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </button>
+            </div>
+
+            <div id="headerText">
+                <h2 id="title">Welcome Back</h2>
+                <p class="subtitle" id="subtitle">Access your enterprise dashboard</p>
+            </div>
+
+            <button class="social-btn" id="googleBtn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <form id="authForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="developer@company.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <i class="fas fa-arrow-right"></i> Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 MyLinkShortener Enterprise. All rights reserved.</p>
+        <div style="margin-top: 15px;">
+            <a href="terms.html"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            <a href="privacy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+            <a href="#" onclick="showSupport()"><i class="fas fa-headset"></i> Support</a>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABekPzR4zxlY8rws16hyYNmFlMXBcggXk",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentMode = 'login';
+
+        // Animated Background
+        for(let i = 0; i < 50; i++) {
+            const span = document.createElement('span');
+            const size = Math.random() * 40 + 10;
+            span.style.width = size + 'px';
+            span.style.height = size + 'px';
+            span.style.left = Math.random() * 100 + '%';
+            span.style.animationDelay = Math.random() * 20 + 's';
+            span.style.animationDuration = Math.random() * 15 + 10 + 's';
+            document.getElementById('bgAnimation').appendChild(span);
+        }
+
+        window.switchTab = (mode) => {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(mode === 'login') {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+                document.getElementById('title').innerHTML = 'Welcome Back <i class="fas fa-hand-peace"></i>';
+                document.getElementById('subtitle').innerText = 'Access your enterprise dashboard';
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-arrow-right"></i> Sign In';
+            } else {
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                document.getElementById('title').innerHTML = 'Create Account <i class="fas fa-rocket"></i>';
+                document.getElementById('subtitle').innerText = 'Start your enterprise journey';
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+            }
+        };
+
+        // Google Login
+        document.getElementById('googleBtn').onclick = async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                if (!userSnap.exists()) {
+                    await setDoc(userRef, {
+                        email: user.email,
+                        name: user.displayName,
+                        createdAt: new Date().toISOString(),
+                        plan: "enterprise",
+                        totalLinks: 0,
+                        totalClicks: 0
+                    });
+                }
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Welcome!',
+                    text: `Hello ${user.displayName || user.email}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                setTimeout(() => window.location.href = "dashboard.html", 2000);
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        };
+
+        // Form Submit
+        document.getElementById('submitBtn').onclick = async () => {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if(!email || !password) {
+                Swal.fire('Missing Fields', 'Please fill all fields', 'warning');
+                return;
+            }
+            
+            if(currentMode === 'signup' && password.length < 6) {
+                Swal.fire('Weak Password', 'Password must be at least 6 characters', 'warning');
+                return;
+            }
+
+            try {
+                if(currentMode === 'signup') {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await sendEmailVerification(userCredential.user);
+                    await setDoc(doc(db, "users", userCredential.user.uid), {
+                        email: email,
+                        createdAt: new Date().toISOString(),
+                        plan: "enterprise",
+                        totalLinks: 0,
+                        totalClicks: 0
+                    });
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Verification Email Sent!',
+                        text: 'Please verify your email before logging in',
+                        confirmButtonColor: '#667eea'
+                    });
+                    switchTab('login');
+                } else {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    
+                    if(userCredential.user.emailVerified) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Login Successful!',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        setTimeout(() => window.location.href = "dashboard.html", 1500);
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Email Not Verified',
+                            text: 'Please verify your email address',
+                            footer: '<a href="#" id="resendLink">Resend Verification Email</a>'
+                        });
+                        document.getElementById('resendLink')?.addEventListener('click', async () => {
+                            await sendEmailVerification(userCredential.user);
+                            Swal.fire('Sent!', 'Verification email resent', 'success');
+                        });
+                    }
+                }
+            } catch (error) {
+                let msg = error.message;
+                if(error.code === 'auth/invalid-credential') msg = 'Invalid email or password';
+                if(error.code === 'auth/user-not-found') msg = 'No account found';
+                if(error.code === 'auth/email-already-in-use') msg = 'Email already registered';
+                Swal.fire('Authentication Failed', msg, 'error');
+            }
+        };
+
+        window.showSupport = () => {
+            Swal.fire({
+                title: 'Enterprise Support',
+                html: '<i class="fas fa-headset"></i> 24/7 Support<br><br>📧 enterprise@mylinkshortener.com<br>📞 +1 (888) 123-4567<br>💬 Live chat available',
+                confirmButtonColor: '#667eea'
+            });
+        };
+    </script>
+</body>
+</html>

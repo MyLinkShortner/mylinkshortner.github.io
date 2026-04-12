@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MyLinkShortener Enterprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 5%;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-top: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        .card-subtitle {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Form */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        input, select {
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Links List */
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .link-item {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .link-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .link-url {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            word-break: break-all;
+        }
+
+        .link-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-warning {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .copy-btn {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .retract-btn {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Chart */
+        .chart-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+
+        /* Footer Nav */
+        .footer-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-around;
+            z-index: 90;
+        }
+
+        .footer-nav a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .footer-nav a:hover {
+            color: #667eea;
+        }
+
+        .logout-btn {
+            color: #dc2626 !important;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="#" class="logo"><i class="fas fa-link"></i> MyLinkShortener</a>
+        <div class="user-menu">
+            <span id="userEmail" style="font-weight: 600;"></span>
+            <div class="user-avatar" id="userAvatar">?</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-link"></i></div>
+                <div class="stat-value" id="totalLinks">0</div>
+                <div class="stat-label">Total Links</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-value" id="totalClicks">0</div>
+                <div class="stat-label">Total Clicks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value" id="activeLinks">0</div>
+                <div class="stat-label">Active Links</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-value" id="avgClicks">0</div>
+                <div class="stat-label">Avg Clicks/Link</div>
+            </div>
+        </div>
+
+        <!-- Create Link Card -->
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Create Smart Link</h2>
+            <p class="card-subtitle">Enterprise-grade encryption with retraction support</p>
+            <div class="form-row">
+                <input type="text" id="longUrl" placeholder="https://your-destination.com/important-page">
+                <select id="expirySelect">
+                    <option value="never">Never Expires</option>
+                    <option value="7">Expires in 7 days</option>
+                    <option value="30">Expires in 30 days</option>
+                    <option value="90">Expires in 90 days</option>
+                </select>
+                <button class="btn-primary" id="shortenBtn"><i class="fas fa-magic"></i> Generate Link</button>
+            </div>
+        </div>
+
+        <!-- Analytics Chart -->
+        <div class="card">
+            <h2><i class="fas fa-chart-bar"></i> Click Analytics</h2>
+            <div class="chart-container">
+                <canvas id="clicksChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Links List -->
+        <div class="links-header">
+            <h2><i class="fas fa-list"></i> Your Links</h2>
+            <span class="badge badge-success"><i class="fas fa-shield-alt"></i> Encrypted</span>
+        </div>
+        <div id="linksList"></div>
+    </div>
+
+    <nav class="footer-nav">
+        <a href="#" onclick="showAnalytics()"><i class="fas fa-chart-line"></i> Analytics</a>
+        <a href="#" onclick="showSecurity()"><i class="fas fa-shield-alt"></i> Security</a>
+        <a href="terms.html"><i class="fas fa-file-contract"></i> Terms</a>
+        <a href="privacy.html"><i class="fas fa-lock"></i> Privacy</a>
+        <a href="#" id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABekPzR4zxlY8rws16hyYNmFlMXBcggXk",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUser = null;
+        let clicksChart = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.emailVerified) {
+                currentUser = user;
+                document.getElementById('userEmail').innerText = user.email.split('@')[0];
+                document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
+                loadLinks();
+                updateStats();
+                initChart();
+            } else if (user && !user.emailVerified) {
+                Swal.fire('Email Not Verified', 'Please verify your email', 'warning');
+                await signOut(auth);
+                window.location.href = "index.html";
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        async function updateStats() {
+            if (!currentUser) return;
+            const q = query(collection(db, "links"), where("userId", "==", currentUser.uid));
+            onSnapshot(q, (snapshot) => {
+                let totalClicks = 0;
+                let activeCount = 0;
+                const now = new Date();
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    totalClicks += data.clicks || 0;
+                    if (!data.retracted && (!data.expiryDate || new Date(data.expiryDate) > now)) {
+                        activeCount++;
+                    }
+                });
+                
+                document.getElementById('totalLinks').innerText = snapshot.size;
+                document.getElementById('totalClicks').innerText = totalClicks;
+                document.getElementById('activeLinks').innerText = activeCount;
+                document.getElementById('avgClicks').innerText = snapshot.size > 0 ? Math.round(totalClicks / snapshot.size) : 0;
+            });
+        }
+
+        document.getElementById('shortenBtn').onclick = async () => {
+            const longUrl = document.getElementById('longUrl').value.trim();
+            if(!longUrl) {
+                Swal.fire('Error', 'Please enter a valid URL', 'error');
+                return;
+            }
+            
+            const shortId = Math.random().toString(36).substring(2, 8);
+            const expirySelect = document.getElementById('expirySelect').value;
+            let expiryDate = null;
+            
+            if (expirySelect !== 'never') {
+                expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + parseInt(expirySelect));
+            }
+            
+            await addDoc(collection(db, "links"), {
+                userId: currentUser.uid,
+                longUrl: longUrl,
+                shortId: shortId,
+                clicks: 0,
+                retracted: false,
+                createdAt: new Date().toISOString(),
+                expiryDate: expiryDate ? expiryDate.toISOString() : null,
+                lastClicked: null
+            });
+            
+            document.getElementById('longUrl').value = "";
+            Swal.fire({
+                icon: 'success',
+                title: 'Link Created!',
+                text: `Short link: ${window.location.origin}/redirect.html?id=${shortId}`,
+                confirmButtonText: 'OK'
+            });
+        };
+
+        function loadLinks() {
+            const q = query(collection(db, "links"), where("userId", "==", currentUser.uid));
+            onSnapshot(q, (snapshot) => {
+                const linksList = document.getElementById('linksList');
+                linksList.innerHTML = "";
+                
+                const sortedLinks = snapshot.docs.sort((a, b) => {
+                    return new Date(b.data().createdAt) - new Date(a.data().createdAt);
+                });
+                
+                sortedLinks.forEach(docItem => {
+                    const data = docItem.data();
+                    const shortUrl = `${window.location.origin}/redirect.html?id=${data.shortId}`;
+                    const isExpired = data.expiryDate && new Date(data.expiryDate) < new Date();
+                    const isRetracted = data.retracted === true;
+                    
+                    let statusBadge = '';
+                    if(isRetracted) statusBadge = '<span class="badge badge-danger"><i class="fas fa-ban"></i> Retracted</span>';
+                    else if(isExpired) statusBadge = '<span class="badge badge-warning"><i class="fas fa-clock"></i> Expired</span>';
+                    else statusBadge = '<span class="badge badge-success"><i class="fas fa-check-circle"></i> Active</span>';
+                    
+                    linksList.innerHTML += `
+                        <div class="link-item" style="opacity: ${isRetracted ? '0.5' : '1'}; ${isRetracted ? 'background: #fef2f2;' : ''}">
+                            <div class="link-url" onclick="window.open('${shortUrl}', '_blank')">
+                                <i class="fas fa-link"></i> ${shortUrl}
+                            </div>
+                            <div class="link-details">
+                                <div>
+                                    <span class="badge badge-success"><i class="fas fa-mouse-pointer"></i> ${data.clicks || 0} clicks</span>
+                                    ${statusBadge}
+                                </div>
+                                <div>
+                                    <span style="font-size:0.7rem; color:#64748b;">
+                                        <i class="fas fa-calendar"></i> ${new Date(data.createdAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+                                <div class="action-btns">
+                                    <button class="action-btn copy-btn" onclick="copyToClipboard('${shortUrl}')">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                    ${!isRetracted ? `<button class="action-btn retract-btn" onclick="retractLink('${docItem.id}')">
+                                        <i class="fas fa-ban"></i> Retract
+                                    </button>` : ''}
+                                    <button class="action-btn delete-btn" onclick="deleteLink('${docItem.id}')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                if (sortedLinks.length === 0) {
+                    linksList.innerHTML = '<div style="text-align:center; padding:60px; color:#64748b;"><i class="fas fa-link" style="font-size:3rem; margin-bottom:1rem; display:block;"></i>No links yet. Create your first link above!</div>';
+                }
+            });
+        }
+
+        window.retractLink = async (linkId) => {
+            const result = await Swal.fire({
+                title: 'Retract Link?',
+                text: 'Retracted links will no longer redirect users. You can still see them in your history.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#92400e',
+                confirmButtonText: 'Yes, retract it'
+            });
+            
+            if (result.isConfirmed) {
+                await updateDoc(doc(db, "links", linkId), {
+                    retracted: true,
+                    retractedAt: new Date().toISOString()
+                });
+                Swal.fire('Retracted!', 'The link has been retracted and will no longer work.', 'success');
+            }
+        };
+
+        window.copyToClipboard = (text) => {
+            navigator.clipboard.writeText(text);
+            Swal.fire({
+                icon: 'success',
+                title: 'Copied!',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        };
+        
+        window.deleteLink = async (linkId) => {
+            const result = await Swal.fire({
+                title: 'Delete Link?',
+                text: 'This action cannot be undone',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Yes, delete'
+            });
+            
+            if (result.isConfirmed) {
+                await deleteDoc(doc(db, "links", linkId));
+                Swal.fire('Deleted!', 'Link has been permanently removed', 'success');
+            }
+        };
+        
+        function initChart() {
+            const ctx = document.getElementById('clicksChart').getContext('2d');
+            clicksChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Clicks',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        window.showAnalytics = () => {
+            Swal.fire({
+                title: 'Analytics Dashboard',
+                html: `
+                    <div style="text-align: left;">
+                        <p><i class="fas fa-link"></i> Total Links: ${document.getElementById('totalLinks').innerText}</p>
+                        <p><i class="fas fa-chart-line"></i> Total Clicks: ${document.getElementById('totalClicks').innerText}</p>
+                        <p><i class="fas fa-check-circle"></i> Active Links: ${document.getElementById('activeLinks').innerText}</p>
+                        <p><i class="fas fa-chart-bar"></i> Avg Clicks/Link: ${document.getElementById('avgClicks').innerText}</p>
+                    </div>
+                `,
+                confirmButtonColor: '#667eea'
+            });
+        };
+        
+        window.showSecurity = () => {
+            Swal.fire({
+                title: 'Security Features',
+                html: `
+                    <div style="text-align: left;">
+                        <p><i class="fas fa-check-circle"></i> End-to-End Encryption</p>
+                        <p><i class="fas fa-check-circle"></i> Link Retraction Support</p>
+                        <p><i class="fas fa-check-circle"></i> Automatic Expiry</p>
+                        <p><i class="fas fa-check-circle"></i> Click Tracking & Analytics</p>
+                        <p><i class="fas fa-check-circle"></i> Secure Firebase Backend</p>
+                    </div>
+                `,
+                confirmButtonColor: '#667eea'
+            });
+        };
+        
+        document.getElementById('logoutBtn').onclick = async () => {
+            await signOut(auth);
+            window.location.href = "index.html";
+        };
+    </script>
+</body>
+</html>
