@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Dashboard | MyLinkShortener</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .profile-container { position: relative; }
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 50px;
+            background: #f1f5f9;
+            transition: all 0.3s;
+        }
+        .profile-btn:hover { background: #e2e8f0; }
+        .profile-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            width: 260px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+            border: 1px solid #e2e8f0;
+        }
+        .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-header { padding: 1rem; border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 16px 16px 0 0; }
+        .dropdown-email { font-size: 0.8rem; color: #64748b; word-break: break-all; }
+        .dropdown-item {
+            padding: 12px 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.85rem;
+            color: #0f172a;
+        }
+        .dropdown-item:hover { background: #f1f5f9; }
+        .dropdown-item.logout-item { color: #dc2626; }
+
+        /* Profile Modal */
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 { font-size: 1.3rem; color: #0f172a; }
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: #f1f5f9;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .modal-body { padding: 1.5rem; }
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+        }
+        .profile-info-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        .profile-info-icon {
+            width: 40px;
+            height: 40px;
+            background: #e0e7ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 1.1rem;
+        }
+        .profile-info-content { flex: 1; }
+        .profile-info-label {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .profile-info-value {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.95rem;
+        }
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin: 1.5rem 0;
+        }
+        .profile-stat-item {
+            text-align: center;
+            padding: 0.8rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+        .profile-stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+        .profile-stat-label {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+        }
+        .modal-footer { padding: 1rem 1.5rem 1.5rem; text-align: center; }
+        .btn-close-modal {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 1.5rem; 
+            margin-bottom: 2rem;
+            overflow-x: hidden;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            background: #e0e7ff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.8rem;
+        }
+        .stat-icon i { font-size: 1.3rem; color: #2563eb; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: #0f172a; }
+        .stat-label { font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+
+        .link-selector-container {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .link-selector-container label {
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .link-selector {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .chart-header h3 { 
+            font-size: 1rem; 
+            color: #0f172a; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+        .view-toggle { display: flex; gap: 5px; }
+        .view-btn {
+            padding: 5px 10px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .view-btn.active { background: #2563eb; color: white; }
+        canvas { max-height: 220px; width: 100% !important; }
+
+        /* Lists */
+        .device-list, .country-list, .browser-list {
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .device-list::-webkit-scrollbar,
+        .country-list::-webkit-scrollbar,
+        .browser-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .device-list::-webkit-scrollbar-thumb,
+        .country-list::-webkit-scrollbar-thumb,
+        .browser-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .device-item, .country-item, .browser-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .device-info, .country-info, .browser-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        .device-icon, .browser-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #2563eb;
+        }
+        .country-flag {
+            font-size: 1.3rem;
+            width: 28px;
+            text-align: center;
+        }
+        .device-name, .country-name, .browser-name {
+            font-weight: 500;
+            color: #0f172a;
+            font-size: 0.85rem;
+        }
+        .device-clicks, .country-clicks, .browser-clicks {
+            font-weight: 700;
+            color: #2563eb;
+            background: #e0e7ff;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        .percentage-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 5px;
+        }
+        .percentage-bar {
+            width: 50px;
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .percentage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            border-radius: 3px;
+        }
+        .percentage-text {
+            font-size: 0.7rem;
+            color: #64748b;
+            min-width: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card h2 { font-size: 1.3rem; margin-bottom: 0.5rem; color: #0f172a; }
+        .form-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .form-group input {
+            flex: 2;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 0.9rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .form-group select {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .btn-primary {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+        .btn-secondary {
+            padding: 12px 24px;
+            background: #f1f5f9;
+            color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+        .links-header h3 { font-size: 1.1rem; color: #0f172a; }
+        .links-grid { display: grid; gap: 1rem; }
+        .link-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .link-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+        .link-card.selected {
+            border: 2px solid #2563eb;
+            background: #f8fafc;
+        }
+        .link-url {
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 0.8rem;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .link-url i { font-size: 0.9rem; }
+        .link-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .link-stats {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .stat-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .clicks-badge {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        .status-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .link-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover { transform: scale(1.05); }
+        .copy-btn { background: #f1f5f9; color: #0f172a; }
+        .copy-btn:hover { background: #e2e8f0; }
+        .delete-btn { background: #fee2e2; color: #dc2626; }
+        .delete-btn:hover { background: #fecaca; }
+        .analytics-btn { background: #e0e7ff; color: #2563eb; }
+        .analytics-btn:hover { background: #c7d2fe; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            color: #64748b;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 1000px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 700px) {
+            .form-group { flex-direction: column; }
+            .btn-primary { width: 100%; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="#" class="logo">🔗 MyLinkShortener</a>
+        <div class="profile-container">
+            <div class="profile-btn" onclick="toggleDropdown()">
+                <div class="profile-avatar" id="profileAvatar">?</div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                    <div class="profile-avatar" style="width: 45px; height: 45px; font-size: 1.2rem; margin-bottom: 8px;" id="dropdownAvatar">?</div>
+                    <div style="font-weight: 700; color: #0f172a;" id="dropdownName">User</div>
+                    <div class="dropdown-email" id="dropdownEmail"></div>
+                </div>
+                <button class="dropdown-item" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</button>
+                <button class="dropdown-item" onclick="window.location.href='terms.html'"><i class="fas fa-file-contract"></i> Terms of Service</button>
+                <button class="dropdown-item" onclick="window.location.href='privacy.html'"><i class="fas fa-lock"></i> Privacy Policy</button>
+                <button class="dropdown-item" onclick="showSupport()"><i class="fas fa-headset"></i> Support</button>
+                <button class="dropdown-item logout-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Profile Modal -->
+    <div class="profile-modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+                <button class="close-btn" onclick="closeProfileModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-avatar-large" id="modalAvatar">?</div>
+                
+                <div class="profile-stats">
+                    <div class="profile-stat-item">
+                        <div class="profile-stat-value" id="modalTotalLinks">0</div>
+                        <div class="profile-stat-label">Total Links</div>
+                    </div>
+                    <div class="profile-stat-item">
+                        <div class="profile-stat-value" id="modalTotalClicks">0</div>
+                        <div class="profile-stat-label">Total Clicks</div>
+                    </div>
+                    <div class="profile-stat-item">
+                        <div class="profile-stat-value" id="modalMemberSince">-</div>
+                        <div class="profile-stat-label">Member Since</div>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon"><i class="fas fa-user"></i></div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Display Name</div>
+                        <div class="profile-info-value" id="profileDisplayName">-</div>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Email Address</div>
+                        <div class="profile-info-value" id="profileEmail">-</div>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Account Created</div>
+                        <div class="profile-info-value" id="profileCreated">-</div>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Email Status</div>
+                        <div class="profile-info-value" id="profileVerified">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close-modal" onclick="closeProfileModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-link"></i></div>
+                <div class="stat-value" id="totalLinks">0</div>
+                <div class="stat-label">Total Links</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-value" id="totalClicks">0</div>
+                <div class="stat-label">Total Clicks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value" id="activeLinks">0</div>
+                <div class="stat-label">Active Links</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="stat-value" id="avgClicks">0</div>
+                <div class="stat-label">Avg Clicks/Link</div>
+            </div>
+        </div>
+
+        <!-- Link Selector -->
+        <div class="link-selector-container">
+            <label><i class="fas fa-chart-pie"></i> Select Link to View Analytics:</label>
+            <select id="linkSelector" class="link-selector">
+                <option value="all">📊 All Links (Combined Analytics)</option>
+            </select>
+            <button class="btn-secondary" onclick="refreshAnalytics()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Clicks Over Time -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Clicks Over Time (Last 7 Days)</h3>
+                </div>
+                <canvas id="clicksChart"></canvas>
+            </div>
+            
+            <!-- Device Distribution -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-mobile-alt"></i> Device Distribution</h3>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="toggleDeviceView('chart')">Chart</button>
+                        <button class="view-btn" onclick="toggleDeviceView('list')">List</button>
+                    </div>
+                </div>
+                <div id="deviceChartContainer">
+                    <canvas id="deviceChart"></canvas>
+                </div>
+                <div id="deviceListContainer" style="display: none;" class="device-list"></div>
+            </div>
+            
+            <!-- Top Countries -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-globe"></i> Top Countries</h3>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="toggleCountryView('chart')">Chart</button>
+                        <button class="view-btn" onclick="toggleCountryView('list')">List</button>
+                    </div>
+                </div>
+                <div id="countryChartContainer">
+                    <canvas id="countryChart"></canvas>
+                </div>
+                <div id="countryListContainer" style="display: none;" class="country-list"></div>
+            </div>
+            
+            <!-- Browser Usage -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-browser"></i> Browser Usage</h3>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="toggleBrowserView('chart')">Chart</button>
+                        <button class="view-btn" onclick="toggleBrowserView('list')">List</button>
+                    </div>
+                </div>
+                <div id="browserChartContainer">
+                    <canvas id="browserChart"></canvas>
+                </div>
+                <div id="browserListContainer" style="display: none;" class="browser-list"></div>
+            </div>
+        </div>
+
+        <!-- Create Link Card -->
+        <div class="card">
+            <h2>✨ Create New Short Link</h2>
+            <p style="color:#64748b; font-size:0.85rem;">Paste your long URL below to generate a short link</p>
+            <div class="form-group">
+                <input type="url" id="longUrl" placeholder="https://example.com/your-long-url" required>
+                <select id="expirySelect">
+                    <option value="never">Never Expires</option>
+                    <option value="7">Expires in 7 days</option>
+                    <option value="30">Expires in 30 days</option>
+                    <option value="90">Expires in 90 days</option>
+                </select>
+                <button class="btn-primary" id="shortenBtn"><i class="fas fa-magic"></i> Generate Link</button>
+            </div>
+        </div>
+
+        <!-- Links List -->
+        <div class="links-header">
+            <h3>📊 Your Links</h3>
+            <span class="stat-badge clicks-badge" id="linksCount">0 links</span>
+        </div>
+        <div id="linksList" class="links-grid"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyABekPzR4zxlY8rws16hyYNmFlMXBcggXk",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global Variables
+        let currentUser = null;
+        let selectedLinkId = 'all';
+        let totalClicksForPercentage = 0;
+        let clicksChart, deviceChart, countryChart, browserChart;
+        
+        // Global data stores for real-time updates
+        let globalLinksData = new Map();
+        let globalAnalyticsData = new Map();
+
+        // Country Flags Mapping
+        const countryFlags = {
+            'United States': '🇺🇸', 'United Kingdom': '🇬🇧', 'India': '🇮🇳', 'Germany': '🇩🇪',
+            'France': '🇫🇷', 'Canada': '🇨🇦', 'Australia': '🇦🇺', 'Japan': '🇯🇵',
+            'Brazil': '🇧🇷', 'Spain': '🇪🇸', 'Italy': '🇮🇹', 'Netherlands': '🇳🇱',
+            'Russia': '🇷🇺', 'China': '🇨🇳', 'South Korea': '🇰🇷', 'Mexico': '🇲🇽',
+            'Singapore': '🇸🇬', 'UAE': '🇦🇪', 'Saudi Arabia': '🇸🇦', 'South Africa': '🇿🇦',
+            'Pakistan': '🇵🇰', 'Bangladesh': '🇧🇩', 'Indonesia': '🇮🇩', 'Turkey': '🇹🇷',
+            'Unknown': '🌍'
+        };
+
+        // Browser Icons Mapping
+        const browserIcons = {
+            'Chrome': 'fab fa-chrome', 'Firefox': 'fab fa-firefox', 'Safari': 'fab fa-safari',
+            'Edge': 'fab fa-edge', 'Opera': 'fab fa-opera', 'Samsung': 'fab fa-android',
+            'Unknown': 'fas fa-globe'
+        };
+
+        // Device Icons Mapping
+        const deviceIcons = {
+            'Desktop': 'fas fa-desktop', 'Mobile': 'fas fa-mobile-alt', 'Tablet': 'fas fa-tablet-alt',
+            'iOS': 'fab fa-apple', 'Android': 'fab fa-android', 'Windows': 'fab fa-windows',
+            'Mac': 'fab fa-apple', 'Linux': 'fab fa-linux', 'Unknown': 'fas fa-question-circle'
+        };
+
+        // Toggle Dropdown
+        window.toggleDropdown = () => {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const container = document.querySelector('.profile-container');
+            if (container && !container.contains(e.target)) {
+                document.getElementById('dropdownMenu').classList.remove('show');
+            }
+        });
+
+        // Profile Modal Functions
+        window.openProfileModal = () => {
+            document.getElementById('dropdownMenu').classList.remove('show');
+            const modal = document.getElementById('profileModal');
+            
+            if (currentUser) {
+                document.getElementById('modalAvatar').textContent = currentUser.email.charAt(0).toUpperCase();
+                document.getElementById('profileDisplayName').textContent = currentUser.displayName || currentUser.email.split('@')[0];
+                document.getElementById('profileEmail').textContent = currentUser.email;
+                
+                const creationDate = new Date(currentUser.metadata.creationTime);
+                document.getElementById('profileCreated').textContent = creationDate.toLocaleDateString('en-US', { 
+                    year: 'numeric', month: 'long', day: 'numeric' 
+                });
+                document.getElementById('profileVerified').textContent = currentUser.emailVerified ? '✅ Verified' : '❌ Not Verified';
+                document.getElementById('modalMemberSince').textContent = creationDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                
+                // Update stats from current values
+                document.getElementById('modalTotalLinks').textContent = document.getElementById('totalLinks').textContent;
+                document.getElementById('modalTotalClicks').textContent = document.getElementById('totalClicks').textContent;
+            }
+            
+            modal.classList.add('show');
+        };
+
+        window.closeProfileModal = () => {
+            document.getElementById('profileModal').classList.remove('show');
+        };
+
+        // View Toggle Functions
+        window.toggleDeviceView = (view) => {
+            const card = document.querySelector('#deviceChartContainer').parentElement;
+            card.querySelectorAll('.view-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', (view === 'chart' && i === 0) || (view === 'list' && i === 1));
+            });
+            document.getElementById('deviceChartContainer').style.display = view === 'chart' ? 'block' : 'none';
+            document.getElementById('deviceListContainer').style.display = view === 'list' ? 'block' : 'none';
+        };
+
+        window.toggleCountryView = (view) => {
+            const card = document.querySelector('#countryChartContainer').parentElement;
+            card.querySelectorAll('.view-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', (view === 'chart' && i === 0) || (view === 'list' && i === 1));
+            });
+            document.getElementById('countryChartContainer').style.display = view === 'chart' ? 'block' : 'none';
+            document.getElementById('countryListContainer').style.display = view === 'list' ? 'block' : 'none';
+        };
+
+        window.toggleBrowserView = (view) => {
+            const card = document.querySelector('#browserChartContainer').parentElement;
+            card.querySelectorAll('.view-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', (view === 'chart' && i === 0) || (view === 'list' && i === 1));
+            });
+            document.getElementById('browserChartContainer').style.display = view === 'chart' ? 'block' : 'none';
+            document.getElementById('browserListContainer').style.display = view === 'list' ? 'block' : 'none';
+        };
+
+        // Authentication State Observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.emailVerified) {
+                currentUser = user;
+                const userInitial = user.email.charAt(0).toUpperCase();
+                const displayName = user.displayName || user.email.split('@')[0];
+                
+                document.getElementById('profileAvatar').innerText = userInitial;
+                document.getElementById('dropdownAvatar').innerText = userInitial;
+                document.getElementById('dropdownName').innerText = displayName;
+                document.getElementById('dropdownEmail').innerText = user.email;
+                
+                await setupRealtimeListeners();
+            } else if (user && !user.emailVerified) {
+                await Swal.fire({
+                    title: 'Email Not Verified',
+                    text: 'Please verify your email address to continue.',
+                    icon: 'warning',
+                    confirmButtonColor: '#2563eb'
+                });
+                await signOut(auth);
+                window.location.href = "index.html";
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Setup Real-time Listeners
+        async function setupRealtimeListeners() {
+            if (!currentUser) return;
+            
+            // Listen to links collection
+            const linksQuery = query(collection(db, "links"), where("userId", "==", currentUser.uid));
+            onSnapshot(linksQuery, (snapshot) => {
+                globalLinksData.clear();
+                snapshot.forEach(doc => {
+                    globalLinksData.set(doc.id, { id: doc.id, ...doc.data() });
+                });
+                updateAllStats();
+                renderLinksList();
+            });
+            
+            // Listen to analytics collection
+            const analyticsQuery = query(collection(db, "analytics"), where("userId", "==", currentUser.uid));
+            onSnapshot(analyticsQuery, (snapshot) => {
+                globalAnalyticsData.clear();
+                snapshot.forEach(doc => {
+                    globalAnalyticsData.set(doc.id, { id: doc.id, ...doc.data() });
+                });
+                updateAllStats();
+                loadAnalyticsForSelected();
+            });
+        }
+
+        // Update All Statistics
+        function updateAllStats() {
+            const linksArray = Array.from(globalLinksData.values());
+            const analyticsArray = Array.from(globalAnalyticsData.values());
+            
+            // Calculate total links
+            const totalLinks = linksArray.length;
+            
+            // Calculate total clicks from analytics (this is the source of truth)
+            const totalClicks = analyticsArray.length;
+            
+            // Calculate active links
+            const activeLinksCount = linksArray.filter(link => {
+                if (link.retracted) return false;
+                if (link.expiryDate && new Date(link.expiryDate) < new Date()) return false;
+                return true;
+            }).length;
+            
+            // Calculate average clicks per link
+            const avgClicks = totalLinks > 0 ? Math.round(totalClicks / totalLinks) : 0;
+            
+            // Update UI
+            document.getElementById('totalLinks').innerText = totalLinks;
+            document.getElementById('totalClicks').innerText = totalClicks;
+            document.getElementById('activeLinks').innerText = activeLinksCount;
+            document.getElementById('avgClicks').innerText = avgClicks;
+            document.getElementById('linksCount').innerText = totalLinks + ' link' + (totalLinks !== 1 ? 's' : '');
+            
+            // Update modal stats if open
+            if (document.getElementById('profileModal').classList.contains('show')) {
+                document.getElementById('modalTotalLinks').textContent = totalLinks;
+                document.getElementById('modalTotalClicks').textContent = totalClicks;
+            }
+        }
+
+        // Render Links List
+        function renderLinksList() {
+            const linksList = document.getElementById('linksList');
+            const selector = document.getElementById('linkSelector');
+            
+            // Reset selector
+            selector.innerHTML = '<option value="all">📊 All Links (Combined Analytics)</option>';
+            
+            const sortedLinks = Array.from(globalLinksData.values()).sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+            
+            if (sortedLinks.length === 0) {
+                linksList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-link"></i>
+                        <h3>No Links Yet</h3>
+                        <p>Create your first short link above</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            linksList.innerHTML = "";
+            
+            sortedLinks.forEach(link => {
+                const shortUrl = `${window.location.origin}/redirect.html?id=${link.shortId}`;
+                // Get clicks for this specific link from analytics
+                const linkClicks = Array.from(globalAnalyticsData.values())
+                    .filter(a => a.linkId === link.id).length;
+                
+                // Add to selector
+                const option = document.createElement('option');
+                option.value = link.id;
+                option.textContent = `${link.shortId} - ${linkClicks} click${linkClicks !== 1 ? 's' : ''}`;
+                selector.appendChild(option);
+                
+                // Create link card
+                const isSelected = selectedLinkId === link.id;
+                const card = document.createElement('div');
+                card.className = `link-card ${isSelected ? 'selected' : ''}`;
+                card.dataset.linkId = link.id;
+                
+                card.innerHTML = `
+                    <div class="link-url" onclick="window.open('${shortUrl}', '_blank')">
+                        <i class="fas fa-link"></i> ${shortUrl}
+                    </div>
+                    <div class="link-info">
+                        <div class="link-stats">
+                            <span class="stat-badge clicks-badge">
+                                <i class="fas fa-mouse-pointer"></i> ${linkClicks} click${linkClicks !== 1 ? 's' : ''}
+                            </span>
+                            <span class="stat-badge status-active">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                            <span style="font-size:0.7rem; color:#64748b;">
+                                <i class="fas fa-calendar"></i> ${new Date(link.createdAt).toLocaleDateString()}
+                            </span>
+                        </div>
+                        <div class="link-actions">
+                            <button class="icon-btn analytics-btn" onclick="event.stopPropagation(); selectLinkForAnalytics('${link.id}')" title="View Analytics">
+                                <i class="fas fa-chart-bar"></i>
+                            </button>
+                            <button class="icon-btn copy-btn" onclick="event.stopPropagation(); copyToClipboard('${shortUrl}')" title="Copy Link">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="icon-btn delete-btn" onclick="event.stopPropagation(); deleteLink('${link.id}')" title="Delete Link">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('.icon-btn')) {
+                        selectLinkForAnalytics(link.id);
+                    }
+                });
+                
+                linksList.appendChild(card);
+            });
+        }
+
+        // Select Link for Analytics
+        window.selectLinkForAnalytics = (linkId) => {
+            selectedLinkId = linkId;
+            document.getElementById('linkSelector').value = linkId;
+            
+            document.querySelectorAll('.link-card').forEach(card => {
+                if (card.dataset.linkId === linkId) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+            
+            loadAnalyticsForSelected();
+        };
+
+        // Link Selector Change Event
+        document.getElementById('linkSelector').addEventListener('change', (e) => {
+            selectedLinkId = e.target.value;
+            
+            document.querySelectorAll('.link-card').forEach(card => {
+                if (card.dataset.linkId === selectedLinkId) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+            
+            loadAnalyticsForSelected();
+        });
+
+        // Load Analytics for Selected Link
+        async function loadAnalyticsForSelected() {
+            if (!currentUser) return;
+            
+            try {
+                let analyticsArray = Array.from(globalAnalyticsData.values());
+                
+                // Filter by selected link if not 'all'
+                if (selectedLinkId !== 'all') {
+                    analyticsArray = analyticsArray.filter(a => a.linkId === selectedLinkId);
+                }
+                
+                // Initialize data structures
+                const clicksByDate = {};
+                const devices = {};
+                const countries = {};
+                const browsers = {};
+                
+                // Initialize last 7 days
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    clicksByDate[dateStr] = 0;
+                }
+                
+                totalClicksForPercentage = analyticsArray.length;
+                
+                // Process analytics data
+                analyticsArray.forEach(data => {
+                    // Process date
+                    if (data.clickedAt) {
+                        const clickDate = new Date(data.clickedAt);
+                        const dateStr = clickDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        if (clicksByDate.hasOwnProperty(dateStr)) {
+                            clicksByDate[dateStr]++;
+                        }
+                    }
+                    
+                    // Process device
+                    const device = data.device || 'Unknown';
+                    devices[device] = (devices[device] || 0) + 1;
+                    
+                    // Process country
+                    const country = data.country || 'Unknown';
+                    countries[country] = (countries[country] || 0) + 1;
+                    
+                    // Process browser
+                    const browser = data.browser || 'Unknown';
+                    browsers[browser] = (browsers[browser] || 0) + 1;
+                });
+                
+                // Update UI
+                updateCharts(clicksByDate, devices, countries, browsers);
+                updateDeviceList(devices);
+                updateCountryList(countries);
+                updateBrowserList(browsers);
+                
+            } catch (error) {
+                console.error("Error loading analytics:", error);
+            }
+        }
+
+        // Update Device List
+        function updateDeviceList(devices) {
+            const container = document.getElementById('deviceListContainer');
+            const sorted = Object.entries(devices).sort((a, b) => b[1] - a[1]);
+            
+            if (sorted.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 2rem;">
+                        <i class="fas fa-mobile-alt"></i>
+                        <p>No device data yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sorted.map(([device, clicks]) => {
+                const iconClass = deviceIcons[device] || 'fas fa-desktop';
+                const percentage = totalClicksForPercentage > 0 ? ((clicks / totalClicksForPercentage) * 100).toFixed(1) : 0;
+                return `
+                    <div class="device-item">
+                        <div class="device-info">
+                            <span class="device-icon"><i class="${iconClass}"></i></span>
+                            <span class="device-name">${device}</span>
+                            <div class="percentage-wrapper">
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: ${percentage}%"></div>
+                                </div>
+                                <span class="percentage-text">${percentage}%</span>
+                            </div>
+                        </div>
+                        <span class="device-clicks">${clicks} click${clicks !== 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update Country List
+        function updateCountryList(countries) {
+            const container = document.getElementById('countryListContainer');
+            const sorted = Object.entries(countries).sort((a, b) => b[1] - a[1]);
+            
+            if (sorted.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 2rem;">
+                        <i class="fas fa-globe"></i>
+                        <p>No country data yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sorted.map(([country, clicks]) => {
+                const flag = countryFlags[country] || '🌍';
+                const percentage = totalClicksForPercentage > 0 ? ((clicks / totalClicksForPercentage) * 100).toFixed(1) : 0;
+                return `
+                    <div class="country-item">
+                        <div class="country-info">
+                            <span class="country-flag">${flag}</span>
+                            <span class="country-name">${country}</span>
+                            <div class="percentage-wrapper">
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: ${percentage}%"></div>
+                                </div>
+                                <span class="percentage-text">${percentage}%</span>
+                            </div>
+                        </div>
+                        <span class="country-clicks">${clicks} click${clicks !== 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update Browser List
+        function updateBrowserList(browsers) {
+            const container = document.getElementById('browserListContainer');
+            const sorted = Object.entries(browsers).sort((a, b) => b[1] - a[1]);
+            
+            if (sorted.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 2rem;">
+                        <i class="fas fa-browser"></i>
+                        <p>No browser data yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sorted.map(([browser, clicks]) => {
+                const iconClass = browserIcons[browser] || 'fas fa-globe';
+                const percentage = totalClicksForPercentage > 0 ? ((clicks / totalClicksForPercentage) * 100).toFixed(1) : 0;
+                return `
+                    <div class="browser-item">
+                        <div class="browser-info">
+                            <span class="browser-icon"><i class="${iconClass}"></i></span>
+                            <span class="browser-name">${browser}</span>
+                            <div class="percentage-wrapper">
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: ${percentage}%"></div>
+                                </div>
+                                <span class="percentage-text">${percentage}%</span>
+                            </div>
+                        </div>
+                        <span class="browser-clicks">${clicks} click${clicks !== 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update Charts
+        function updateCharts(clicksByDate, devices, countries, browsers) {
+            const ctx1 = document.getElementById('clicksChart').getContext('2d');
+            const ctx2 = document.getElementById('deviceChart').getContext('2d');
+            const ctx3 = document.getElementById('countryChart').getContext('2d');
+            const ctx4 = document.getElementById('browserChart').getContext('2d');
+            
+            // Destroy existing charts
+            if (clicksChart) clicksChart.destroy();
+            if (deviceChart) deviceChart.destroy();
+            if (countryChart) countryChart.destroy();
+            if (browserChart) browserChart.destroy();
+            
+            // Clicks Over Time Chart
+            clicksChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(clicksByDate),
+                    datasets: [{
+                        label: 'Clicks',
+                        data: Object.values(clicksByDate),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e2e8f0' },
+                            ticks: { stepSize: 1 }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Device Chart
+            const hasDeviceData = Object.keys(devices).length > 0;
+            deviceChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: hasDeviceData ? Object.keys(devices) : ['No Data'],
+                    datasets: [{
+                        data: hasDeviceData ? Object.values(devices) : [1],
+                        backgroundColor: ['#2563eb', '#7c3aed', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 12, font: { size: 10 }, padding: 15 }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+            
+            // Country Chart
+            const hasCountryData = Object.keys(countries).length > 0;
+            let countryLabels = hasCountryData ? Object.keys(countries) : ['No Data'];
+            let countryValues = hasCountryData ? Object.values(countries) : [1];
+            
+            if (hasCountryData && countryLabels.length > 5) {
+                const sorted = Object.entries(countries).sort((a, b) => b[1] - a[1]);
+                countryLabels = sorted.slice(0, 5).map(item => {
+                    const flag = countryFlags[item[0]] || '🌍';
+                    return `${flag} ${item[0]}`;
+                });
+                countryValues = sorted.slice(0, 5).map(item => item[1]);
+            } else if (hasCountryData) {
+                countryLabels = countryLabels.map(c => {
+                    const flag = countryFlags[c] || '🌍';
+                    return `${flag} ${c}`;
+                });
+            }
+            
+            countryChart = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: countryLabels,
+                    datasets: [{
+                        label: 'Clicks',
+                        data: countryValues,
+                        backgroundColor: '#2563eb',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e2e8f0' },
+                            ticks: { stepSize: 1 }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Browser Chart
+            const hasBrowserData = Object.keys(browsers).length > 0;
+            browserChart = new Chart(ctx4, {
+                type: 'pie',
+                data: {
+                    labels: hasBrowserData ? Object.keys(browsers) : ['No Data'],
+                    datasets: [{
+                        data: hasBrowserData ? Object.values(browsers) : [1],
+                        backgroundColor: ['#2563eb', '#7c3aed', '#10b981', '#f59e0b', '#ef4444', '#06b6d4']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 12, font: { size: 10 }, padding: 15 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Refresh Analytics
+        window.refreshAnalytics = () => {
+            loadAnalyticsForSelected();
+            Swal.fire({
+                icon: 'success',
+                title: 'Analytics Refreshed',
+                timer: 1000,
+                showConfirmButton: false
+            });
+        };
+
+        // Create Short Link
+        document.getElementById('shortenBtn').addEventListener('click', async function() {
+            const longUrl = document.getElementById('longUrl').value.trim();
+            
+            if (!longUrl) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please enter a URL',
+                    confirmButtonColor: '#2563eb'
+                });
+                return;
+            }
+            
+            if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid URL',
+                    text: 'URL must start with http:// or https://',
+                    confirmButtonColor: '#2563eb'
+                });
+                return;
+            }
+            
+            const shortId = Math.random().toString(36).substring(2, 8);
+            const expirySelect = document.getElementById('expirySelect').value;
+            let expiryDate = null;
+            
+            if (expirySelect !== 'never') {
+                expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + parseInt(expirySelect));
+            }
+            
+            const btn = document.getElementById('shortenBtn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            btn.disabled = true;
+            
+            try {
+                await addDoc(collection(db, "links"), {
+                    userId: currentUser.uid,
+                    longUrl: longUrl,
+                    shortId: shortId,
+                    retracted: false,
+                    createdAt: new Date().toISOString(),
+                    expiryDate: expiryDate ? expiryDate.toISOString() : null
+                });
+                
+                document.getElementById('longUrl').value = '';
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Link Created!',
+                    html: `Your short link:<br><strong>${window.location.origin}/redirect.html?id=${shortId}</strong>`,
+                    confirmButtonColor: '#2563eb'
+                });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed!',
+                    text: error.message,
+                    confirmButtonColor: '#2563eb'
+                });
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        });
+
+        // Copy to Clipboard
+        window.copyToClipboard = (text) => {
+            navigator.clipboard.writeText(text).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Copied!',
+                    timer: 1000,
+                    showConfirmButton: false
+                });
+            });
+        };
+
+        // Delete Link
+        window.deleteLink = async (linkId) => {
+            const result = await Swal.fire({
+                title: 'Delete Link?',
+                text: 'This action cannot be undone. All analytics data for this link will also be deleted.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel'
+            });
+            
+            if (result.isConfirmed) {
+                try {
+                    // Delete the link
+                    await deleteDoc(doc(db, "links", linkId));
+                    
+                    // Delete associated analytics
+                    const analyticsQuery = query(
+                        collection(db, "analytics"),
+                        where("linkId", "==", linkId)
+                    );
+                    const analyticsSnapshot = await getDocs(analyticsQuery);
+                    
+                    const deletePromises = [];
+                    analyticsSnapshot.forEach((docItem) => {
+                        deletePromises.push(deleteDoc(doc(db, "analytics", docItem.id)));
+                    });
+                    await Promise.all(deletePromises);
+                    
+                    // Reset selection if needed
+                    if (selectedLinkId === linkId) {
+                        selectedLinkId = 'all';
+                        document.getElementById('linkSelector').value = 'all';
+                    }
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'Link and all associated data have been removed.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to delete link: ' + error.message
+                    });
+                }
+            }
+        };
+
+        // Show Support
+        window.showSupport = () => {
+            Swal.fire({
+                title: '📞 Support Center',
+                html: `
+                    <div style="text-align: left; padding: 10px;">
+                        <p style="margin-bottom: 15px;"><i class="fas fa-envelope" style="color: #2563eb; margin-right: 10px;"></i> <strong>Email:</strong> support@mylinkshortener.com</p>
+                        <p style="margin-bottom: 15px;"><i class="fas fa-clock" style="color: #2563eb; margin-right: 10px;"></i> <strong>Response Time:</strong> Within 24 hours</p>
+                        <p style="margin-bottom: 15px;"><i class="fas fa-question-circle" style="color: #2563eb; margin-right: 10px;"></i> <strong>FAQ:</strong> Check our documentation for common questions.</p>
+                    </div>
+                `,
+                confirmButtonColor: '#2563eb',
+                confirmButtonText: 'Close'
+            });
+            document.getElementById('dropdownMenu').classList.remove('show');
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            const result = await Swal.fire({
+                title: 'Logout?',
+                text: 'Are you sure you want to log out?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            });
+            
+            if (result.isConfirmed) {
+                try {
+                    await signOut(auth);
+                    window.location.href = "index.html";
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to logout: ' + error.message
+                    });
+                }
+            }
+            document.getElementById('dropdownMenu').classList.remove('show');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('profileModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('profileModal')) {
+                closeProfileModal();
+            }
+        });
+
+        console.log('✅ Dashboard initialized successfully with real-time click sync!');
+    </script>
+</body>
+</html>
