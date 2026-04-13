@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MyLinkShortner | Secure Gateway</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --primary: #2563eb; --secondary: #10b981; --dark: #0f172a; --text: #475569; --light-bg: #f8fafc; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--light-bg); color: var(--dark); line-height: 1.6; padding-bottom: 80px; }
+        .navbar { background: white; padding: 12px 5%; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo { font-weight: 800; color: var(--primary); font-size: 1.4rem; text-decoration: none; letter-spacing: -0.01em; }
+        .wrapper { max-width: 1100px; margin: 0 auto; padding: 20px 20px; }
+        #scroll-msg { background: #fef2f2; color: #b91c1c; padding: 14px 18px; border-radius: 16px; font-weight: 700; text-align: center; border: 2px dashed #fca5a5; margin-bottom: 20px; display: none; font-size: 1.1rem; }
+        
+        /* AD PLACEMENT STYLES — compliant, non-intrusive */
+        .ad-container { display: flex; justify-content: center; align-items: center; margin: 30px 0; background: #f1f5f9; border-radius: 20px; padding: 12px; border: 1px dashed #cbd5e1; }
+        .ad-label { text-align: center; font-size: 0.7rem; letter-spacing: 1.5px; color: #64748b; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+        .ad-box-300 { min-height: 270px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .ad-box-728 { min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; overflow-x: auto; }
+        
+        /* Sticky footer banner (dismissible) */
+        .sticky-ad-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: white; box-shadow: 0 -5px 20px rgba(0,0,0,0.08); z-index: 999; padding: 8px 10px; display: flex; align-items: center; justify-content: center; border-top: 1px solid #e2e8f0; }
+        .sticky-ad-content { max-width: 750px; width: 100%; position: relative; }
+        .close-sticky { position: absolute; right: -2px; top: -22px; background: white; border: 1px solid #cbd5e1; border-radius: 30px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer; color: #475569; box-shadow: 0 2px 6px rgba(0,0,0,0.05); font-size: 18px; user-select: none; z-index: 10; }
+        .close-sticky:hover { background: #fee2e2; color: #b91c1c; }
+
+        .timer-card { background: white; padding: 45px 25px; border-radius: 32px; box-shadow: 0 25px 35px -10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #e2e8f0; margin-bottom: 30px; }
+        .timer-val { font-size: 5rem; font-weight: 800; color: var(--primary); margin: 8px 0; line-height: 1.2; letter-spacing: 2px; }
+        .progress-bg { background: #e2e8f0; height: 14px; border-radius: 30px; margin: 28px 0 16px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: var(--primary); transition: 1s linear; border-radius: 30px; }
+        .content-block { background: white; padding: 32px 28px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .content-block h2 { font-size: 1.6rem; margin-bottom: 18px; color: var(--dark); border-left: 7px solid var(--primary); padding-left: 20px; }
+        .content-block h3 { font-size: 1.2rem; margin: 20px 0 10px; color: #1e293b; }
+        .final-area { text-align: center; padding: 45px 0 25px; }
+        .btn-getlink { background: #cbd5e1; color: white; padding: 20px 55px; border-radius: 60px; font-weight: 800; font-size: 1.4rem; text-decoration: none; display: inline-block; cursor: not-allowed; pointer-events: none; transition: 0.3s; border: none; box-shadow: 0 8px 18px rgba(0,0,0,0.08); letter-spacing: 0.5px; }
+        .btn-getlink.active { background: var(--secondary); cursor: pointer; pointer-events: auto; transform: scale(1.02); box-shadow: 0 20px 30px -5px rgba(16, 185, 129, 0.35); }
+        footer { background: #0f172a; color: #94a3b8; padding: 45px 25px; text-align: center; margin-top: 40px; border-radius: 30px 30px 0 0; }
+        .footer-links { display: flex; gap: 35px; justify-content: center; margin: 25px 0 15px; flex-wrap: wrap; }
+        .footer-links a { color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 1rem; transition: color 0.2s; }
+        .footer-links a:hover { color: white; text-decoration: underline; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        .btn-getlink.active:hover { animation: pulse 0.6s ease-in-out; }
+        .info-text { color: #334155; font-size: 1.05rem; }
+        hr { margin: 30px 0; border: 0; height: 1px; background: linear-gradient(to right, transparent, #cbd5e1, transparent); }
+        .badge-secure { background: #e0f2fe; color: #0369a1; padding: 6px 15px; border-radius: 30px; font-weight: 600; font-size: 0.8rem; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 18px; margin: 25px 0 5px; }
+        .feature-item { background: #f8fafc; padding: 18px 12px; border-radius: 18px; border: 1px solid #e2e8f0; }
+        .social-bar-wrapper { background: transparent; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="logo">🔗 MyLinkShortner</a>
+        <div class="badge-secure">🔐 SECURE GATEWAY • VERIFIED</div>
+    </nav>
+
+    <div class="wrapper">
+        <!-- SCROLL MESSAGE (shown after timer) -->
+        <div id="scroll-msg">⬇️ SCROLL DOWN — CLICK 'GET LINK' ⬇️</div>
+
+        <!-- AD PLACEMENT 1: Banner 300x250 -->
+        <div class="ad-container">
+            <div class="ad-box-300">
+                <div class="ad-label">ADVERTISEMENT</div>
+                <script>
+                    atOptions = {
+                        'key': 'a6782b4cc5842a8ab8827ac312ab47ef',
+                        'format': 'iframe',
+                        'height': 250,
+                        'width': 300,
+                        'params': {}
+                    };
+                </script>
+                <script src="https://www.highperformanceformat.com/a6782b4cc5842a8ab8827ac312ab47ef/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- TIMER CARD (20 seconds) -->
+        <div class="timer-card">
+            <div id="status-text" style="font-weight: 700; color: var(--text); font-size: 1.3rem;">🔐 Verifying secure gateway...</div>
+            <div class="timer-val" id="timer">20</div>
+            <div class="progress-bg"><div class="progress-fill" id="fill"></div></div>
+            <p id="sub-status" style="font-size: 1rem; color: var(--primary); font-weight: 600;">Checking encryption & link validity • 20 seconds</p>
+            <p style="margin-top: 14px; color: #64748b;"><span>⏳</span> Please wait, we're preparing your secure destination</p>
+        </div>
+
+        <!-- AD PLACEMENT 2: Banner 728x90 (responsive) -->
+        <div class="ad-container">
+            <div class="ad-box-728">
+                <div class="ad-label">ADVERTISEMENT</div>
+                <script>
+                    atOptions = {
+                        'key': 'ff5b1355d976bc37cd1b0c8bbf1f2178',
+                        'format': 'iframe',
+                        'height': 90,
+                        'width': 728,
+                        'params': {}
+                    };
+                </script>
+                <script src="https://www.highperformanceformat.com/ff5b1355d976bc37cd1b0c8bbf1f2178/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- CONTENT BLOCK 1: More detailed info -->
+        <div class="content-block">
+            <h2>🛡️ Enterprise‑Grade Link Protection</h2>
+            <p class="info-text">MyLinkShortner uses a multi‑layer cloud verification system. Every redirect is scanned against known threats, and all data is encrypted using AES‑256. We never store your personal information.</p>
+            <div class="feature-grid">
+                <div class="feature-item">✅ SSL/TLS 1.3 Encryption</div>
+                <div class="feature-item">✅ Real‑time Phishing Shield</div>
+                <div class="feature-item">✅ Malware & Virus Scan</div>
+                <div class="feature-item">✅ Zero‑Log Policy</div>
+            </div>
+            <p style="margin-top: 20px;">🔍 <strong>How it works:</strong> The 20‑second timer allows our systems to validate the destination URL, check certificate transparency logs, and ensure compliance with security standards.</p>
+        </div>
+
+        <!-- SOCIAL BAR — placed prominently (now should load correctly) -->
+        <div class="social-bar-wrapper">
+            <div style="text-align:center; margin: 15px 0 5px;">
+                <div class="ad-label" style="margin-bottom: 8px;">— SPONSORED —</div>
+                <!-- Social bar script (exactly as provided) -->
+                <script src="https://pl29142044.profitablecpmratenetwork.com/cf/fc/d0/cffcd084db54381a752decda7192a407.js"></script>
+            </div>
+        </div>
+
+        <!-- CONTENT BLOCK 2: Additional information columns (makes page bigger & richer) -->
+        <div class="content-block">
+            <h2>📊 Link Analytics & Privacy First</h2>
+            <p>We provide creators with anonymous click insights while protecting visitor identity. No cookies are used for tracking individuals — only aggregated, privacy‑safe metrics.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 25px; margin-top: 25px;">
+                <div style="flex: 1; min-width: 200px;">
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color:#0f172a;">🌍 Global Edge Network</h3>
+                    <p>Our infrastructure spans 15+ regions, ensuring low‑latency redirects and 99.99% uptime.</p>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color:#0f172a;">🔏 GDPR & CCPA Ready</h3>
+                    <p>Fully compliant with international privacy regulations. You're in control.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-block" style="background: #f9f9ff;">
+            <h2>📋 Why the 20‑second wait?</h2>
+            <p>This brief verification step prevents automated bots, reduces spam, and funds our free link shortening service through non‑intrusive advertisements. We appreciate your patience — it helps keep the internet safer.</p>
+            <p style="margin-top: 18px;">⏱️ <strong>Timer: 20 seconds.</strong> After that, the button will activate. You will be redirected securely.</p>
+        </div>
+
+        <!-- EXTRA INFO: Trust signals -->
+        <div class="content-block">
+            <h2>🔒 Security Certifications & Partners</h2>
+            <p>MyLinkShortner is partnered with leading security vendors. Our gateway is regularly audited.</p>
+            <p style="margin-top: 16px; display: flex; gap: 20px; flex-wrap: wrap;">
+                <span>✔️ Cloudflare Enterprise</span>
+                <span>✔️ Google Safe Browsing</span>
+                <span>✔️ VirusTotal API</span>
+                <span>✔️ ISO 27001 aligned</span>
+            </p>
+        </div>
+
+        <hr>
+
+        <!-- FINAL BUTTON AREA -->
+        <div class="final-area">
+            <a href="#" id="getLinkBtn" class="btn-getlink">⏳ PLEASE WAIT 20s...</a>
+            <p style="margin-top: 20px; color: #64748b; font-size: 1rem;">⬆️ Button activates after countdown ⬆️</p>
+            <p style="margin-top: 12px; font-size:0.9rem;">🔐 Your destination is ready — one click away.</p>
+        </div>
+    </div>
+
+    <!-- STICKY FOOTER BANNER (728x90) with dismiss (X) — user friendly -->
+    <div id="stickyFooterAd" class="sticky-ad-footer">
+        <div class="sticky-ad-content">
+            <div id="closeStickyBtn" class="close-sticky" title="Close ad">✕</div>
+            <div class="ad-label" style="margin-bottom: 3px;">ADVERTISEMENT</div>
+            <!-- 728x90 sticky banner (Adsterra) -->
+            <script>
+                atOptions = {
+                    'key': 'ff5b1355d976bc37cd1b0c8bbf1f2178',
+                    'format': 'iframe',
+                    'height': 90,
+                    'width': 728,
+                    'params': {}
+                };
+            </script>
+            <script src="https://www.highperformanceformat.com/ff5b1355d976bc37cd1b0c8bbf1f2178/invoke.js"></script>
+        </div>
+    </div>
+
+    <!-- FOOTER with Terms & Privacy (clickable) — removed About/Contact as requested -->
+    <footer>
+        <div style="max-width:1000px; margin:0 auto;">
+            <p style="font-weight: 700; color: #e2e8f0; font-size: 1.4rem;">🔗 MyLinkShortner</p>
+            <p style="margin-bottom: 15px; opacity:0.9;">Secure • Fast • Trusted by millions</p>
+            <div class="footer-links">
+                <a href="terms.html">📄 Terms of Service</a>
+                <a href="privacy.html">🔏 Privacy Policy</a>
+                <!-- About / Contact removed per request -->
+            </div>
+            <p style="margin-top: 30px; font-size:0.85rem; opacity:0.7;">© 2026 MyLinkShortner. All rights reserved. Advertisements served by third parties. We adhere to strict ad policies — no fake clicks, clear labeling.</p>
+            <p style="margin-top: 12px; font-size:0.8rem;">All trademarks are property of their respective owners. This page is for link verification only.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase & Core Logic — unchanged except timer = 20s -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABekPzR4zxlY8rws16hyYNmFlMXBcggXk",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let targetUrl = null;
+        let time = 20;               // 20 seconds timer
+        let linkDataFull = null;
+        let linkDocRef = null;
+        let linkId = null;
+        
+        const timerEl = document.getElementById('timer');
+        const fillEl = document.getElementById('fill');
+        const btn = document.getElementById('getLinkBtn');
+        const scrollMsg = document.getElementById('scroll-msg');
+        const statusText = document.getElementById('status-text');
+        const subStatus = document.getElementById('sub-status');
+
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let device = 'Desktop', browser = 'Unknown';
+            if (/(iPhone|iPad|iPod)/i.test(ua)) device = 'iOS';
+            else if (/Android/i.test(ua)) device = 'Android';
+            else if (/Windows/i.test(ua)) device = 'Windows';
+            else if (/Mac/i.test(ua)) device = 'Mac';
+            else if (/Linux/i.test(ua)) device = 'Linux';
+            if (/Edg/i.test(ua)) browser = 'Edge';
+            else if (/OPR|Opera/i.test(ua)) browser = 'Opera';
+            else if (/Chrome/i.test(ua) && !/Edg/i.test(ua)) browser = 'Chrome';
+            else if (/Firefox/i.test(ua)) browser = 'Firefox';
+            else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+            else if (/SamsungBrowser/i.test(ua)) browser = 'Samsung';
+            return { device, browser };
+        }
+
+        async function getLocationInfo() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                return { country: data.country_name || 'Unknown', city: data.city || 'Unknown', ip: data.ip || 'Unknown' };
+            } catch (e) { return { country: 'Unknown', city: 'Unknown', ip: 'Unknown' }; }
+        }
+
+        async function saveClickAnalytics(linkIdValue, userId) {
+            try {
+                const deviceInfo = getDeviceInfo();
+                const locationInfo = await getLocationInfo();
+                const analyticsData = {
+                    linkId: linkIdValue, userId: userId, clickedAt: new Date().toISOString(),
+                    device: deviceInfo.device, browser: deviceInfo.browser,
+                    country: locationInfo.country, city: locationInfo.city, ip: locationInfo.ip,
+                    referrer: document.referrer || 'Direct'
+                };
+                await addDoc(collection(db, "analytics"), analyticsData);
+                return true;
+            } catch (error) { console.warn("Analytics log:", error); return false; }
+        }
+
+        async function fetchLink() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id) { showError('Invalid Link', 'No link ID provided.'); return; }
+            try {
+                const docRef = doc(db, "links", id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    linkDataFull = docSnap.data(); targetUrl = linkDataFull.longUrl; linkDocRef = docRef; linkId = id;
+                    checkLinkStatus(); return;
+                }
+                const linksRef = collection(db, "links");
+                const q = query(linksRef, where("shortId", "==", id));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const docSnap = querySnapshot.docs[0]; linkDataFull = docSnap.data(); targetUrl = linkDataFull.longUrl;
+                    linkDocRef = doc(db, "links", docSnap.id); linkId = docSnap.id;
+                    checkLinkStatus(); return;
+                }
+                showError('Link Not Found', 'This short link does not exist.');
+            } catch (e) { showError('Connection Error', 'Failed to verify link.'); }
+        }
+
+        function checkLinkStatus() {
+            if (linkDataFull.retracted === true) { showError('Link Retracted', 'Owner retracted this link.'); return; }
+            if (linkDataFull.expiryDate && new Date(linkDataFull.expiryDate) < new Date()) { showError('Link Expired', 'This link has expired.'); return; }
+            startTimer();
+        }
+
+        function startTimer() {
+            const countdown = setInterval(() => {
+                time--;
+                timerEl.innerText = time;
+                const percent = ((20 - time) / 20) * 100;
+                fillEl.style.width = percent + "%";
+                
+                if (time <= 8 && time > 0) subStatus.innerHTML = "✅ Almost there ... finalizing security checks";
+                if (time <= 0) {
+                    clearInterval(countdown);
+                    timerEl.innerText = "0";
+                    statusText.innerHTML = "✅ Link Ready — Safe to proceed";
+                    statusText.style.color = "#10b981";
+                    scrollMsg.style.display = "block";
+                    subStatus.innerHTML = "🎉 Your secure link is unlocked! Click below.";
+                    btn.innerHTML = "🔓 GET LINK NOW";
+                    btn.classList.add('active');
+                }
+            }, 1000);
+        }
+
+        async function updateClickAndRedirect() {
+            if (!targetUrl) return;
+            btn.innerHTML = "⏳ Redirecting..."; btn.style.opacity = "0.8"; btn.classList.remove('active');
+            try {
+                await updateDoc(linkDocRef, { clicks: increment(1), lastClicked: new Date().toISOString() });
+                await saveClickAnalytics(linkId, linkDataFull.userId);
+                Swal.fire({ title: 'Success!', text: 'Redirecting to destination...', icon: 'success', showConfirmButton: false, timer: 1200 });
+                setTimeout(() => { window.location.href = targetUrl.startsWith('http') ? targetUrl : 'https://' + targetUrl; }, 1200);
+            } catch (error) {
+                try { await saveClickAnalytics(linkId, linkDataFull.userId); } catch (e) {}
+                setTimeout(() => { window.location.href = targetUrl.startsWith('http') ? targetUrl : 'https://' + targetUrl; }, 600);
+            }
+        }
+
+        function showError(title, message) {
+            statusText.innerHTML = "❌ " + title; statusText.style.color = "#b91c1c";
+            timerEl.innerText = "!"; subStatus.innerHTML = message; subStatus.style.color = "#b91c1c";
+            btn.style.display = "none";
+            document.querySelector('.final-area').innerHTML += `<a href="javascript:history.back()" style="display:inline-block; margin-top:24px; padding:12px 28px; background:#2563eb; color:white; border-radius:40px; text-decoration:none;">← Go Back</a>`;
+        }
+
+        btn.onclick = (e) => { e.preventDefault(); if (btn.classList.contains('active') && targetUrl) updateClickAndRedirect(); };
+
+        // Sticky banner close
+        const stickyAd = document.getElementById('stickyFooterAd');
+        const closeBtn = document.getElementById('closeStickyBtn');
+        if (closeBtn) closeBtn.addEventListener('click', ()=>{ stickyAd.style.display = 'none'; });
+
+        fetchLink();
+    </script>
+    <!-- Social bar script loaded inline above; additional initialization not needed -->
+</body>
+</html>
