@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Secure Gateway • Step 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --secondary: #10b981; --dark: #0f172a; --text: #475569; --light-bg: #f8fafc; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--light-bg); color: var(--dark); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar { background: white; padding: 14px 5%; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo { font-weight: 800; color: var(--primary); font-size: 1.3rem; text-decoration: none; letter-spacing: -0.01em; }
+        .step-badge { background: #e0e7ff; color: #2563eb; padding: 8px 18px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; }
+        .wrapper { max-width: 900px; margin: 0 auto; padding: 30px 20px; flex: 1; width: 100%; }
+        .progress-steps { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px; }
+        .step-dot { width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; transition: 0.3s; }
+        .step-dot.active { background: var(--primary); width: 14px; height: 14px; box-shadow: 0 0 0 4px rgba(37,99,235,0.2); }
+        .step-dot.done { background: var(--secondary); }
+        .step-line { width: 40px; height: 2px; background: #e2e8f0; }
+        .step-line.done { background: var(--secondary); }
+        .timer-card { background: white; padding: 35px 25px; border-radius: 28px; box-shadow: 0 15px 30px -10px rgba(0,0,0,0.06); text-align: center; border: 1px solid #e2e8f0; margin-bottom: 25px; }
+        .timer-val { font-size: 4.5rem; font-weight: 800; color: var(--primary); margin: 10px 0; line-height: 1.2; letter-spacing: 2px; }
+        .progress-bg { background: #e2e8f0; height: 12px; border-radius: 20px; margin: 24px 0 12px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: var(--primary); transition: 1s linear; border-radius: 20px; }
+        .content-block { background: white; padding: 28px 24px; border-radius: 20px; border: 1px solid #e2e8f0; margin-bottom: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .content-block h2 { font-size: 1.4rem; margin-bottom: 14px; color: var(--dark); border-left: 5px solid var(--primary); padding-left: 16px; }
+        .content-block h3 { font-size: 1.1rem; margin: 16px 0 8px; color: #1e293b; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 12px; margin: 18px 0 5px; }
+        .feature-item { background: #f8fafc; padding: 14px 12px; border-radius: 14px; border: 1px solid #e2e8f0; font-size: 0.9rem; }
+        .btn-next { background: var(--secondary); color: white; padding: 16px 45px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; text-decoration: none; display: inline-block; cursor: pointer; transition: 0.3s; border: none; box-shadow: 0 10px 20px rgba(16,185,129,0.2); }
+        .btn-next:hover { transform: translateY(-2px); box-shadow: 0 15px 28px rgba(16,185,129,0.3); }
+        .final-area { text-align: center; padding: 30px 0 15px; }
+        footer { background: #0f172a; color: #94a3b8; padding: 30px 20px; text-align: center; margin-top: auto; border-radius: 24px 24px 0 0; }
+        .footer-links { display: flex; gap: 28px; justify-content: center; margin: 18px 0 10px; flex-wrap: wrap; }
+        .footer-links a { color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+        .footer-links a:hover { color: white; text-decoration: underline; }
+        @media (max-width: 600px) { .timer-val { font-size: 3rem; } .wrapper { padding: 20px 14px; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="logo">🔗 MyLinkShortner</a>
+        <div class="step-badge">Step 1 of 2</div>
+    </nav>
+
+    <div class="wrapper">
+        <div class="progress-steps">
+            <div class="step-dot active"></div>
+            <div class="step-line"></div>
+            <div class="step-dot"></div>
+        </div>
+
+        <div class="timer-card">
+            <div id="status-text" style="font-weight: 700; color: var(--text); font-size: 1.2rem;">🔐 Initializing Secure Gateway...</div>
+            <div class="timer-val" id="timer">20</div>
+            <div class="progress-bg"><div class="progress-fill" id="fill"></div></div>
+            <p id="sub-status" style="font-size: 0.95rem; color: var(--primary); font-weight: 600;">Verifying connection & encryption protocols</p>
+            <p style="margin-top: 12px; color: #64748b; font-size: 0.85rem;">⏳ Please wait — this ensures your safety</p>
+        </div>
+
+        <div class="content-block">
+            <h2>🛡️ Why This Security Layer?</h2>
+            <p>MyLinkShortner verifies every link through multiple security checkpoints before allowing access. This protects you from malicious content, phishing attempts, and harmful redirects.</p>
+            <div class="feature-grid">
+                <div class="feature-item">🔒 SSL/TLS Encryption</div>
+                <div class="feature-item">🛑 Phishing Detection</div>
+                <div class="feature-item">🦠 Malware Scanning</div>
+                <div class="feature-item">✅ Link Validation</div>
+            </div>
+        </div>
+
+        <div class="content-block">
+            <h2>🌍 Global Protection Network</h2>
+            <p>Our infrastructure spans multiple regions worldwide, ensuring that every link is checked against real-time threat databases before you proceed.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px;">
+                <div style="flex: 1; min-width: 150px;">
+                    <h3>⚡ Fast Verification</h3>
+                    <p style="font-size:0.9rem;">Average check time under 20 seconds</p>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <h3>🔐 Zero Logging</h3>
+                    <p style="font-size:0.9rem;">Your privacy is our priority</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-block" style="background: #f9f9ff;">
+            <h2>📋 How It Works</h2>
+            <p>1️⃣ <strong>Step 1 (Current):</strong> Initial security verification<br>
+            2️⃣ <strong>Step 2:</strong> Final confirmation & redirect</p>
+            <p style="margin-top: 10px; font-size:0.9rem;">This two-step process ensures maximum protection for our users.</p>
+        </div>
+
+        <div class="final-area">
+            <a href="#" id="nextStepBtn" class="btn-next" style="display: none; background: #cbd5e1; cursor: not-allowed; pointer-events: none;">⏳ PLEASE WAIT...</a>
+            <p id="nextMsg" style="margin-top: 14px; color: #64748b; font-size: 0.9rem;">Button activates after countdown</p>
+        </div>
+    </div>
+
+    <footer>
+        <div style="max-width:800px; margin:0 auto;">
+            <p style="font-weight: 700; color: #e2e8f0;">🔗 MyLinkShortner</p>
+            <div class="footer-links">
+                <a href="terms.html">📄 Terms of Service</a>
+                <a href="privacy.html">🔏 Privacy Policy</a>
+            </div>
+            <p style="margin-top: 15px; font-size:0.8rem; opacity:0.7;">© 2026 MyLinkShortner. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const linkId = urlParams.get('id');
+        
+        let time = 20;
+        const timerEl = document.getElementById('timer');
+        const fillEl = document.getElementById('fill');
+        const nextBtn = document.getElementById('nextStepBtn');
+        const nextMsg = document.getElementById('nextMsg');
+        const statusText = document.getElementById('status-text');
+        const subStatus = document.getElementById('sub-status');
+
+        if (!linkId) {
+            document.body.innerHTML = '<div style="text-align:center;padding:50px;"><h2>Invalid Link</h2><p>No link ID provided.</p><a href="javascript:history.back()">Go Back</a></div>';
+        }
+
+        const countdown = setInterval(() => {
+            time--;
+            timerEl.innerText = time;
+            fillEl.style.width = ((20 - time) / 20 * 100) + "%";
+
+            if (time <= 10 && time > 5) {
+                subStatus.innerHTML = "🔍 Scanning destination URL...";
+            } else if (time <= 5 && time > 0) {
+                subStatus.innerHTML = "✅ Verification nearly complete...";
+            }
+
+            if (time <= 0) {
+                clearInterval(countdown);
+                timerEl.innerText = "0";
+                statusText.innerHTML = "✅ Step 1 Complete — Ready to Continue";
+                statusText.style.color = "#10b981";
+                subStatus.innerHTML = "🎉 Security check passed! Proceed to final step.";
+                
+                nextBtn.style.display = 'inline-block';
+                nextBtn.style.background = '#10b981';
+                nextBtn.style.cursor = 'pointer';
+                nextBtn.style.pointerEvents = 'auto';
+                nextBtn.innerHTML = '🔓 CONTINUE TO STEP 2 →';
+                nextMsg.innerHTML = '✅ Verification complete — click above';
+            }
+        }, 1000);
+
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (time <= 0 && linkId) {
+                window.location.href = `step2.html?id=${encodeURIComponent(linkId)}`;
+            }
+        });
+    </script>
+</body>
+</html>
