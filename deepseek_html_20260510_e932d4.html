@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Dashboard | MyLinkShortener</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .profile-container { position: relative; }
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 50px;
+            background: #f1f5f9;
+            transition: all 0.3s;
+        }
+        .profile-btn:hover { background: #e2e8f0; }
+        .profile-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            width: 260px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+            border: 1px solid #e2e8f0;
+        }
+        .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-header { padding: 1rem; border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 16px 16px 0 0; }
+        .dropdown-email { font-size: 0.8rem; color: #64748b; word-break: break-all; }
+        .dropdown-item {
+            padding: 12px 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.85rem;
+            color: #0f172a;
+        }
+        .dropdown-item:hover { background: #f1f5f9; }
+        .dropdown-item.logout-item { color: #dc2626; }
+
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 { font-size: 1.3rem; color: #0f172a; }
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: #f1f5f9;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .modal-body { padding: 1.5rem; }
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+        }
+        .profile-info-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        .profile-info-icon {
+            width: 40px;
+            height: 40px;
+            background: #e0e7ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 1.1rem;
+        }
+        .profile-info-content { flex: 1; }
+        .profile-info-label {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .profile-info-value {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.95rem;
+        }
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin: 1.5rem 0;
+        }
+        .profile-stat-item {
+            text-align: center;
+            padding: 0.8rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+        .profile-stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+        .profile-stat-label {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+        }
+        .modal-footer { padding: 1rem 1.5rem 1.5rem; text-align: center; }
+        .btn-close-modal {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 1.5rem; 
+            margin-bottom: 2rem;
+            overflow-x: hidden;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            background: #e0e7ff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.8rem;
+        }
+        .stat-icon i { font-size: 1.3rem; color: #2563eb; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: #0f172a; }
+        .stat-label { font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+
+        .cpm-section {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .cpm-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+        .cpm-header h2 {
+            font-size: 1.4rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cpm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .cpm-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.2rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .cpm-card.earnings {
+            background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+            border-color: #10b981;
+        }
+        .cpm-card h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+        .cpm-amount {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .cpm-amount.green { color: #10b981; }
+        .cpm-rate {
+            font-size: 0.8rem;
+            color: #2563eb;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .country-cpm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+        .country-cpm-table th {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .country-cpm-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .flag-cpm { font-size: 1.2rem; margin-right: 6px; }
+
+        .link-selector-container {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .link-selector-container label {
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .link-selector {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .chart-header h3 { 
+            font-size: 1rem; 
+            color: #0f172a; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+        .view-toggle { display: flex; gap: 5px; }
+        .view-btn {
+            padding: 5px 10px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .view-btn.active { background: #2563eb; color: white; }
+        canvas { max-height: 220px; width: 100% !important; }
+
+        .device-list, .country-list, .browser-list {
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .device-list::-webkit-scrollbar,
+        .country-list::-webkit-scrollbar,
+        .browser-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .device-list::-webkit-scrollbar-thumb,
+        .country-list::-webkit-scrollbar-thumb,
+        .browser-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .device-item, .country-item, .browser-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .device-info, .country-info, .browser-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        .device-icon, .browser-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #2563eb;
+        }
+        .country-flag {
+            font-size: 1.3rem;
+            width: 28px;
+            text-align: center;
+        }
+        .device-name, .country-name, .browser-name {
+            font-weight: 500;
+            color: #0f172a;
+            font-size: 0.85rem;
+        }
+        .device-clicks, .country-clicks, .browser-clicks {
+            font-weight: 700;
+            color: #2563eb;
+            background: #e0e7ff;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        .percentage-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 5px;
+        }
+        .percentage-bar {
+            width: 50px;
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .percentage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            border-radius: 3px;
+        }
+        .percentage-text {
+            font-size: 0.7rem;
+            color: #64748b;
+            min-width: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card h2 { font-size: 1.3rem; margin-bottom: 0.5rem; color: #0f172a; }
+        .form-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .form-group input {
+            flex: 2;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 0.9rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .form-group select {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .btn-primary {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+        .btn-secondary {
+            padding: 12px 24px;
+            background: #f1f5f9;
+            color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+        .links-header h3 { font-size: 1.1rem; color: #0f172a; }
+        .links-grid { display: grid; gap: 1rem; }
+        .link-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .link-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+        .link-card.selected {
+            border: 2px solid #2563eb;
+            background: #f8fafc;
+        }
+        .link-url {
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 0.8rem;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .link-url i { font-size: 0.9rem; }
+        .link-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .link-stats {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .stat-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .clicks-badge {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        .status-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .link-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover { transform: scale(1.05); }
+        .copy-btn { background: #f1f5f9; color: #0f172a; }
+        .copy-btn:hover { background: #e2e8f0; }
+        .delete-btn { background: #fee2e2; color: #dc2626; }
+        .delete-btn:hover { background: #fecaca; }
+        .analytics-btn { background: #e0e7ff; color: #2563eb; }
+        .analytics-btn:hover { background: #c7d2fe; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            color: #64748b;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 1000px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 700px) {
+            .form-group { flex-direction: column; }
+            .btn-primary { width: 100%; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="#" class="logo">🔗 MyLinkShortener</a>
+        <div class="profile-container">
+            <div class="profile-btn" onclick="toggleDropdown()">
+                <div class="profile-avatar" id="profileAvatar">?</div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                    <div class="profile-avatar" style="width: 45px; height: 45px; font-size: 1.2rem; margin-bottom: 8px;" id="dropdownAvatar">?</div>
+                    <div style="font-weight: 700; color: #0f172a;" id="dropdownName">User</div>
+                    <div class="dropdown-email" id="dropdownEmail"></div>
+                </div>
+                <button class="dropdown-item" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</button>
+                <button class="dropdown-item" onclick="window.location.href='terms.html'"><i class="fas fa-file-contract"></i> Terms of Service</button>
+                <button class="dropdown-item" onclick="window.location.href='privacy.html'"><i class="fas fa-lock"></i> Privacy Policy</button>
+                <button class="dropdown-item" onclick="showSupport()"><i class="fas fa-headset"></i> Support</button>
+                <button class="dropdown-item logout-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="profile-modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+                <button class="close-btn" onclick="closeProfileModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-avatar-large" id="modalAvatar">?</div>
+                <div class="profile-stats">
+                    <div class="profile-stat-item">
+                        <div class="profile-stat-value" id="modalTotalLinks">0</div>
+                        <div class="profile-stat-label">Total Links</div>
+                    </div>
+                    <div class="profile-stat-item">
+                        <div class="profile-stat-value" id="modalTotalClicks">0</div>
+                        <div class="profile-stat-label">Total Clicks</div>
+                    </div>
+                    <div class="profile-stat-item">
+                        <div class="profile-stat-value" id="modalMemberSince">-</div>
+                        <div class="profile-stat-label">Member Since</div>
+                    </div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-icon"><i class="fas fa-user"></i></div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Display Name</div>
+                        <div class="profile-info-value" id="profileDisplayName">-</div>
+                    </div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Email Address</div>
+                        <div class="profile-info-value" id="profileEmail">-</div>
+                    </div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Account Created</div>
+                        <div class="profile-info-value" id="profileCreated">-</div>
+                    </div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Email Status</div>
+                        <div class="profile-info-value" id="profileVerified">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close-modal" onclick="closeProfileModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-link"></i></div>
+                <div class="stat-value" id="totalLinks">0</div>
+                <div class="stat-label">Total Links</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-value" id="totalClicks">0</div>
+                <div class="stat-label">Total Clicks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value" id="activeLinks">0</div>
+                <div class="stat-label">Active Links</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="stat-value" id="avgClicks">0</div>
+                <div class="stat-label">Avg Clicks/Link</div>
+            </div>
+        </div>
+
+        <div class="cpm-section">
+            <div class="cpm-header">
+                <h2><i class="fas fa-dollar-sign" style="color:#10b981;"></i> Estimated Earnings</h2>
+            </div>
+            <div class="cpm-grid">
+                <div class="cpm-card">
+                    <h4>Average CPM</h4>
+                    <div class="cpm-amount" id="avgCpmValue">$4.20</div>
+                    <div class="cpm-rate">global average</div>
+                </div>
+                <div class="cpm-card earnings">
+                    <h4>Gross Earnings</h4>
+                    <div class="cpm-amount green" id="grossEarnings">$0.00</div>
+                    <div class="cpm-rate">before deductions</div>
+                </div>
+                <div class="cpm-card">
+                    <h4>Platform Fee</h4>
+                    <div class="cpm-amount" id="platformFee" style="color:#ef4444;">$0.00</div>
+                    <div class="cpm-rate">processing fee</div>
+                </div>
+                <div class="cpm-card earnings">
+                    <h4>Net Earnings</h4>
+                    <div class="cpm-amount green" id="netEarnings">$0.00</div>
+                    <div class="cpm-rate">your payout</div>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="country-cpm-table" id="countryCpmTable">
+                    <thead>
+                        <tr><th>Country</th><th>Clicks</th><th>CPM Rate</th><th>Earnings</th></tr>
+                    </thead>
+                    <tbody id="cpmTableBody">
+                        <tr><td colspan="4" style="text-align:center; padding:20px;">Loading country data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size:0.7rem; color:#64748b; margin-top:12px;">*Estimated earnings based on ad network data. Actual results may vary.</p>
+        </div>
+
+        <div class="link-selector-container">
+            <label><i class="fas fa-chart-pie"></i> Select Link to View Analytics:</label>
+            <select id="linkSelector" class="link-selector">
+                <option value="all">📊 All Links (Combined Analytics)</option>
+            </select>
+            <button class="btn-secondary" onclick="refreshAnalytics()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Clicks Over Time (Last 7 Days)</h3>
+                </div>
+                <canvas id="clicksChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-mobile-alt"></i> Device Distribution</h3>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="toggleDeviceView('chart')">Chart</button>
+                        <button class="view-btn" onclick="toggleDeviceView('list')">List</button>
+                    </div>
+                </div>
+                <div id="deviceChartContainer"><canvas id="deviceChart"></canvas></div>
+                <div id="deviceListContainer" style="display: none;" class="device-list"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-globe"></i> Top Countries</h3>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="toggleCountryView('chart')">Chart</button>
+                        <button class="view-btn" onclick="toggleCountryView('list')">List</button>
+                    </div>
+                </div>
+                <div id="countryChartContainer"><canvas id="countryChart"></canvas></div>
+                <div id="countryListContainer" style="display: none;" class="country-list"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-browser"></i> Browser Usage</h3>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="toggleBrowserView('chart')">Chart</button>
+                        <button class="view-btn" onclick="toggleBrowserView('list')">List</button>
+                    </div>
+                </div>
+                <div id="browserChartContainer"><canvas id="browserChart"></canvas></div>
+                <div id="browserListContainer" style="display: none;" class="browser-list"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>✨ Create New Short Link</h2>
+            <p style="color:#64748b; font-size:0.85rem;">Paste your long URL below to generate a short link</p>
+            <div class="form-group">
+                <input type="url" id="longUrl" placeholder="https://example.com/your-long-url" required>
+                <select id="expirySelect">
+                    <option value="never">Never Expires</option>
+                    <option value="7">Expires in 7 days</option>
+                    <option value="30">Expires in 30 days</option>
+                    <option value="90">Expires in 90 days</option>
+                </select>
+                <button class="btn-primary" id="shortenBtn"><i class="fas fa-magic"></i> Generate Link</button>
+            </div>
+        </div>
+
+        <div class="links-header">
+            <h3>📊 Your Links</h3>
+            <span class="stat-badge clicks-badge" id="linksCount">0 links</span>
+        </div>
+        <div id="linksList" class="links-grid"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABekPzR4zxlY8rws16hyYNmFlMXBcggXk",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let selectedLinkId = 'all';
+        let totalClicksForPercentage = 0;
+        let clicksChart, deviceChart, countryChart, browserChart;
+        let globalLinksData = new Map();
+        let globalAnalyticsData = new Map();
+
+        const countryCpmRates = {
+            'United States': 5.80, 'United Kingdom': 4.90, 'Canada': 4.50, 'Australia': 4.30,
+            'Germany': 4.10, 'France': 3.70, 'India': 0.80, 'Brazil': 1.20,
+            'Spain': 2.90, 'Italy': 2.80, 'Netherlands': 3.60, 'Japan': 4.20,
+            'Mexico': 1.10, 'South Korea': 3.80, 'Singapore': 4.60, 'UAE': 3.90,
+            'Saudi Arabia': 2.50, 'South Africa': 1.40, 'Pakistan': 0.50, 'Bangladesh': 0.45,
+            'Indonesia': 0.70, 'Turkey': 0.90, 'Russia': 0.60, 'China': 0.40,
+            'Unknown': 1.50
+        };
+
+        const countryFlags = {
+            'United States': '🇺🇸', 'United Kingdom': '🇬🇧', 'India': '🇮🇳', 'Germany': '🇩🇪',
+            'France': '🇫🇷', 'Canada': '🇨🇦', 'Australia': '🇦🇺', 'Japan': '🇯🇵',
+            'Brazil': '🇧🇷', 'Spain': '🇪🇸', 'Italy': '🇮🇹', 'Netherlands': '🇳🇱',
+            'Russia': '🇷🇺', 'China': '🇨🇳', 'South Korea': '🇰🇷', 'Mexico': '🇲🇽',
+            'Singapore': '🇸🇬', 'UAE': '🇦🇪', 'Saudi Arabia': '🇸🇦', 'South Africa': '🇿🇦',
+            'Pakistan': '🇵🇰', 'Bangladesh': '🇧🇩', 'Indonesia': '🇮🇩', 'Turkey': '🇹🇷',
+            'Unknown': '🌍'
+        };
+
+        const browserIcons = {
+            'Chrome': 'fab fa-chrome', 'Firefox': 'fab fa-firefox', 'Safari': 'fab fa-safari',
+            'Edge': 'fab fa-edge', 'Opera': 'fab fa-opera', 'Samsung': 'fab fa-android',
+            'Unknown': 'fas fa-globe'
+        };
+
+        const deviceIcons = {
+            'Desktop': 'fas fa-desktop', 'Mobile': 'fas fa-mobile-alt', 'Tablet': 'fas fa-tablet-alt',
+            'iOS': 'fab fa-apple', 'Android': 'fab fa-android', 'Windows': 'fab fa-windows',
+            'Mac': 'fab fa-apple', 'Linux': 'fab fa-linux', 'Unknown': 'fas fa-question-circle'
+        };
+
+        window.toggleDropdown = () => document.getElementById('dropdownMenu').classList.toggle('show');
+        document.addEventListener('click', (e) => {
+            if (!document.querySelector('.profile-container')?.contains(e.target)) 
+                document.getElementById('dropdownMenu').classList.remove('show');
+        });
+
+        window.openProfileModal = () => {
+            document.getElementById('dropdownMenu').classList.remove('show');
+            const modal = document.getElementById('profileModal');
+            if (currentUser) {
+                document.getElementById('modalAvatar').textContent = currentUser.email.charAt(0).toUpperCase();
+                document.getElementById('profileDisplayName').textContent = currentUser.displayName || currentUser.email.split('@')[0];
+                document.getElementById('profileEmail').textContent = currentUser.email;
+                document.getElementById('profileCreated').textContent = new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('profileVerified').textContent = currentUser.emailVerified ? '✅ Verified' : '❌ Not Verified';
+                document.getElementById('modalMemberSince').textContent = new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                document.getElementById('modalTotalLinks').textContent = document.getElementById('totalLinks').textContent;
+                document.getElementById('modalTotalClicks').textContent = document.getElementById('totalClicks').textContent;
+            }
+            modal.classList.add('show');
+        };
+        window.closeProfileModal = () => document.getElementById('profileModal').classList.remove('show');
+
+        window.toggleDeviceView = (v) => {
+            const card = document.querySelector('#deviceChartContainer').parentElement;
+            card.querySelectorAll('.view-btn').forEach((b,i)=> b.classList.toggle('active', (v==='chart'&&i===0)||(v==='list'&&i===1)));
+            document.getElementById('deviceChartContainer').style.display = v==='chart'?'block':'none';
+            document.getElementById('deviceListContainer').style.display = v==='list'?'block':'none';
+        };
+        window.toggleCountryView = (v) => {
+            const card = document.querySelector('#countryChartContainer').parentElement;
+            card.querySelectorAll('.view-btn').forEach((b,i)=> b.classList.toggle('active', (v==='chart'&&i===0)||(v==='list'&&i===1)));
+            document.getElementById('countryChartContainer').style.display = v==='chart'?'block':'none';
+            document.getElementById('countryListContainer').style.display = v==='list'?'block':'none';
+        };
+        window.toggleBrowserView = (v) => {
+            const card = document.querySelector('#browserChartContainer').parentElement;
+            card.querySelectorAll('.view-btn').forEach((b,i)=> b.classList.toggle('active', (v==='chart'&&i===0)||(v==='list'&&i===1)));
+            document.getElementById('browserChartContainer').style.display = v==='chart'?'block':'none';
+            document.getElementById('browserListContainer').style.display = v==='list'?'block':'none';
+        };
+
+        function updateCpmEarnings(analyticsArray) {
+            const countryClicks = {};
+            analyticsArray.forEach(a => {
+                const c = a.country || 'Unknown';
+                countryClicks[c] = (countryClicks[c] || 0) + 1;
+            });
+
+            let totalGross = 0;
+            const countryRows = [];
+            const sorted = Object.entries(countryClicks).sort((a,b)=> b[1]-a[1]);
+
+            sorted.forEach(([country, clicks]) => {
+                const cpm = countryCpmRates[country] || 1.5;
+                const earnings = (clicks / 1000) * cpm;
+                totalGross += earnings;
+                countryRows.push({ country, clicks, cpm, earnings });
+            });
+
+            const platformFeePercent = 0.15;
+            const platformFee = totalGross * platformFeePercent;
+            const netEarnings = totalGross - platformFee;
+
+            document.getElementById('grossEarnings').textContent = `$${totalGross.toFixed(2)}`;
+            document.getElementById('platformFee').textContent = `-$${platformFee.toFixed(2)}`;
+            document.getElementById('netEarnings').textContent = `$${netEarnings.toFixed(2)}`;
+
+            const avgCpm = analyticsArray.length > 0 ? 
+                (sorted.reduce((acc, [c,clicks]) => acc + (countryCpmRates[c]||1.5)*clicks, 0) / analyticsArray.length).toFixed(2) 
+                : '4.20';
+            document.getElementById('avgCpmValue').textContent = `$${avgCpm}`;
+
+            const tbody = document.getElementById('cpmTableBody');
+            if (countryRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No data yet</td></tr>';
+                return;
+            }
+            tbody.innerHTML = countryRows.slice(0, 8).map(r => `
+                <tr>
+                    <td>${countryFlags[r.country] || '🌍'} ${r.country}</td>
+                    <td>${r.clicks}</td>
+                    <td>$${r.cpm.toFixed(2)}</td>
+                    <td>$${r.earnings.toFixed(3)}</td>
+                </tr>
+            `).join('');
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.emailVerified) {
+                currentUser = user;
+                document.getElementById('profileAvatar').innerText = user.email.charAt(0).toUpperCase();
+                document.getElementById('dropdownAvatar').innerText = user.email.charAt(0).toUpperCase();
+                document.getElementById('dropdownName').innerText = user.displayName || user.email.split('@')[0];
+                document.getElementById('dropdownEmail').innerText = user.email;
+                await setupRealtimeListeners();
+            } else if (user && !user.emailVerified) {
+                await Swal.fire({ title: 'Email Not Verified', text: 'Please verify email.', icon: 'warning', confirmButtonColor: '#2563eb' });
+                await signOut(auth); window.location.href = "index.html";
+            } else window.location.href = "index.html";
+        });
+
+        async function setupRealtimeListeners() {
+            if (!currentUser) return;
+            const linksQuery = query(collection(db, "links"), where("userId", "==", currentUser.uid));
+            onSnapshot(linksQuery, (snap) => {
+                globalLinksData.clear();
+                snap.forEach(d => globalLinksData.set(d.id, { id: d.id, ...d.data() }));
+                updateAllStats(); renderLinksList(); updateLinkSelector();
+            });
+            const analyticsQuery = query(collection(db, "analytics"), where("userId", "==", currentUser.uid));
+            onSnapshot(analyticsQuery, (snap) => {
+                globalAnalyticsData.clear();
+                snap.forEach(d => globalAnalyticsData.set(d.id, { id: d.id, ...d.data() }));
+                updateAllStats(); renderLinksList(); updateLinkSelector(); loadAnalyticsForSelected();
+            });
+        }
+
+        function updateLinkSelector() {
+            const sel = document.getElementById('linkSelector');
+            const val = sel.value;
+            sel.innerHTML = '<option value="all">📊 All Links (Combined Analytics)</option>';
+            Array.from(globalLinksData.values()).sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt)).forEach(l=> {
+                const clicks = Array.from(globalAnalyticsData.values()).filter(a=>a.linkId===l.id).length;
+                sel.add(new Option(`${l.shortId} - ${clicks} clicks`, l.id));
+            });
+            if (val && (val==='all' || globalLinksData.has(val))) sel.value = val;
+        }
+
+        function updateAllStats() {
+            const links = Array.from(globalLinksData.values());
+            const analytics = Array.from(globalAnalyticsData.values());
+            document.getElementById('totalLinks').innerText = links.length;
+            document.getElementById('totalClicks').innerText = analytics.length;
+            document.getElementById('activeLinks').innerText = links.filter(l=>!l.retracted && (!l.expiryDate || new Date(l.expiryDate)>new Date())).length;
+            document.getElementById('avgClicks').innerText = links.length ? Math.round(analytics.length/links.length) : 0;
+            document.getElementById('linksCount').innerText = links.length + ' link'+(links.length!==1?'s':'');
+        }
+
+        function renderLinksList() {
+            const container = document.getElementById('linksList');
+            const sorted = Array.from(globalLinksData.values()).sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+            if (!sorted.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-link"></i><h3>No Links Yet</h3></div>';
+                return;
+            }
+            container.innerHTML = sorted.map(link => {
+                const shortUrl = `${window.location.origin}/redirect.html?id=${link.shortId}`;
+                const clicks = Array.from(globalAnalyticsData.values()).filter(a=>a.linkId===link.id).length;
+                const active = !link.retracted && (!link.expiryDate || new Date(link.expiryDate)>new Date());
+                const selected = selectedLinkId===link.id ? 'selected' : '';
+                return `<div class="link-card ${selected}" data-link-id="${link.id}">
+                    <div class="link-url" onclick="window.open('${shortUrl}','_blank')"><i class="fas fa-link"></i> ${shortUrl}</div>
+                    <div class="link-info"><div class="link-stats">
+                        <span class="stat-badge clicks-badge"><i class="fas fa-mouse-pointer"></i> ${clicks}</span>
+                        <span class="stat-badge ${active?'status-active':''}" style="${!active?'background:#fee2e2;color:#dc2626;':''}">${active?'Active':'Inactive'}</span>
+                    </div><div class="link-actions">
+                        <button class="icon-btn analytics-btn" onclick="event.stopPropagation();selectLinkForAnalytics('${link.id}')"><i class="fas fa-chart-bar"></i></button>
+                        <button class="icon-btn copy-btn" onclick="event.stopPropagation();copyToClipboard('${shortUrl}')"><i class="fas fa-copy"></i></button>
+                        <button class="icon-btn delete-btn" onclick="event.stopPropagation();deleteLink('${link.id}')"><i class="fas fa-trash"></i></button>
+                    </div></div></div>`;
+            }).join('');
+            document.querySelectorAll('.link-card').forEach(card => card.addEventListener('click', (e)=> {
+                if(!e.target.closest('.icon-btn')) selectLinkForAnalytics(card.dataset.linkId);
+            }));
+        }
+
+        window.selectLinkForAnalytics = (id) => {
+            selectedLinkId = id;
+            document.getElementById('linkSelector').value = id;
+            document.querySelectorAll('.link-card').forEach(c=>c.classList.toggle('selected', c.dataset.linkId===id));
+            loadAnalyticsForSelected();
+        };
+
+        document.getElementById('linkSelector').addEventListener('change', e => {
+            selectedLinkId = e.target.value;
+            document.querySelectorAll('.link-card').forEach(c=>c.classList.toggle('selected', c.dataset.linkId===selectedLinkId));
+            loadAnalyticsForSelected();
+        });
+
+        async function loadAnalyticsForSelected() {
+            if (!currentUser) return;
+            let arr = Array.from(globalAnalyticsData.values());
+            if (selectedLinkId !== 'all') arr = arr.filter(a=>a.linkId===selectedLinkId);
+            totalClicksForPercentage = arr.length;
+            const clicksByDate = {}; for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); clicksByDate[d.toLocaleDateString('en-US',{month:'short',day:'numeric'})]=0; }
+            const devices={}, countries={}, browsers={};
+            arr.forEach(d=>{
+                if(d.clickedAt){ const dt=new Date(d.clickedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}); if(clicksByDate[dt]!==undefined) clicksByDate[dt]++; }
+                devices[d.device||'Unknown']=(devices[d.device||'Unknown']||0)+1;
+                countries[d.country||'Unknown']=(countries[d.country||'Unknown']||0)+1;
+                browsers[d.browser||'Unknown']=(browsers[d.browser||'Unknown']||0)+1;
+            });
+            updateCharts(clicksByDate, devices, countries, browsers);
+            updateDeviceList(devices); updateCountryList(countries); updateBrowserList(browsers);
+            updateCpmEarnings(arr);
+        }
+
+        function updateDeviceList(dev){ 
+            const c=document.getElementById('deviceListContainer');
+            const s=Object.entries(dev).sort((a,b)=>b[1]-a[1]);
+            c.innerHTML = s.length ? s.map(([d,cl])=>`<div class="device-item"><div class="device-info"><span class="device-icon"><i class="${deviceIcons[d]||'fas fa-desktop'}"></i></span><span class="device-name">${d}</span></div><span class="device-clicks">${cl}</span></div>`).join('') : '<div class="empty-state"><i class="fas fa-mobile-alt"></i><p>No data</p></div>';
+        }
+        function updateCountryList(co){ 
+            const c=document.getElementById('countryListContainer');
+            const s=Object.entries(co).sort((a,b)=>b[1]-a[1]);
+            c.innerHTML = s.length ? s.map(([cn,cl])=>`<div class="country-item"><div class="country-info"><span class="country-flag">${countryFlags[cn]||'🌍'}</span><span class="country-name">${cn}</span></div><span class="country-clicks">${cl}</span></div>`).join('') : '<div class="empty-state"><i class="fas fa-globe"></i><p>No data</p></div>';
+        }
+        function updateBrowserList(br){ 
+            const c=document.getElementById('browserListContainer');
+            const s=Object.entries(br).sort((a,b)=>b[1]-a[1]);
+            c.innerHTML = s.length ? s.map(([b,cl])=>`<div class="browser-item"><div class="browser-info"><span class="browser-icon"><i class="${browserIcons[b]||'fas fa-globe'}"></i></span><span class="browser-name">${b}</span></div><span class="browser-clicks">${cl}</span></div>`).join('') : '<div class="empty-state"><i class="fas fa-browser"></i><p>No data</p></div>';
+        }
+
+        function updateCharts(cbd, dev, cou, bro){
+            if(clicksChart) clicksChart.destroy(); if(deviceChart) deviceChart.destroy(); if(countryChart) countryChart.destroy(); if(browserChart) browserChart.destroy();
+            const ctx1=document.getElementById('clicksChart').getContext('2d');
+            clicksChart=new Chart(ctx1,{type:'line',data:{labels:Object.keys(cbd),datasets:[{label:'Clicks',data:Object.values(cbd),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.1)',tension:0.4,fill:true}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#e2e8f0'}}}}});
+            deviceChart=new Chart(document.getElementById('deviceChart').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(dev).length?Object.keys(dev):['No Data'],datasets:[{data:Object.keys(dev).length?Object.values(dev):[1],backgroundColor:['#2563eb','#7c3aed','#10b981','#f59e0b']}]},options:{cutout:'60%'}});
+            countryChart=new Chart(document.getElementById('countryChart').getContext('2d'),{type:'bar',data:{labels:Object.keys(cou).slice(0,5).map(c=>`${countryFlags[c]||'🌍'} ${c}`),datasets:[{data:Object.values(cou).slice(0,5),backgroundColor:'#2563eb'}]}});
+            browserChart=new Chart(document.getElementById('browserChart').getContext('2d'),{type:'pie',data:{labels:Object.keys(bro).length?Object.keys(bro):['No Data'],datasets:[{data:Object.keys(bro).length?Object.values(bro):[1]}]}});
+        }
+
+        window.refreshAnalytics = ()=> { loadAnalyticsForSelected(); Swal.fire({icon:'success',title:'Refreshed',timer:1000,showConfirmButton:false}); };
+        document.getElementById('shortenBtn').addEventListener('click', async function(){
+            const url = document.getElementById('longUrl').value.trim();
+            if(!url||(!url.startsWith('http://')&&!url.startsWith('https://'))) return Swal.fire({icon:'error',title:'Invalid URL'});
+            const sid=Math.random().toString(36).substring(2,8), exp=document.getElementById('expirySelect').value;
+            let ed=null; if(exp!=='never'){ ed=new Date(); ed.setDate(ed.getDate()+parseInt(exp)); }
+            this.disabled=true; this.innerHTML='<i class="fas fa-spinner fa-spin"></i> Creating...';
+            await addDoc(collection(db,"links"),{userId:currentUser.uid,longUrl:url,shortId:sid,retracted:false,createdAt:new Date().toISOString(),expiryDate:ed?ed.toISOString():null});
+            document.getElementById('longUrl').value=''; this.disabled=false; this.innerHTML='<i class="fas fa-magic"></i> Generate Link';
+            Swal.fire({icon:'success',title:'Created!',html:`${window.location.origin}/redirect.html?id=${sid}`});
+        });
+        window.copyToClipboard=(t)=>{ navigator.clipboard.writeText(t); Swal.fire({icon:'success',title:'Copied!',timer:1000,showConfirmButton:false}); };
+        window.deleteLink=async(id)=>{
+            const conf=await Swal.fire({title:'Delete?',icon:'warning',showCancelButton:true,confirmButtonColor:'#dc2626'});
+            if(conf.isConfirmed){ await deleteDoc(doc(db,"links",id)); if(selectedLinkId===id){ selectedLinkId='all'; document.getElementById('linkSelector').value='all'; } }
+        };
+        window.showSupport=()=> Swal.fire({title:'Support',html:'<p>Email: vanshbro2010@gmail.com</p>',confirmButtonColor:'#2563eb'});
+        document.getElementById('logoutBtn').addEventListener('click',async()=>{ await signOut(auth); window.location.href='index.html'; });
+        document.getElementById('profileModal').addEventListener('click',e=>{ if(e.target===document.getElementById('profileModal')) closeProfileModal(); });
+    </script>
+</body>
+</html>
