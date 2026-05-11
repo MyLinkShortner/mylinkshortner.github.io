@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Final Verification • Step 2 | MyLinkShortner</title>
+    <meta name="description" content="MyLinkShortner secure link gateway - final verification step before accessing your destination. Step 2 of our security protocol.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Monetag Popunder Ads -->
+    <script src="https://quge5.com/88/tag.min.js" data-zone="231085" async data-cfasync="false"></script>
+    <style>
+        :root { --primary: #7c3aed; --secondary: #10b981; --dark: #0f172a; --text: #475569; --light-bg: #f8fafc; --accent: #f5f3ff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--light-bg); color: var(--dark); line-height: 1.7; min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { background: #0f172a; color: white; text-align: center; padding: 8px 20px; font-size: 0.8rem; letter-spacing: 0.5px; }
+        .top-bar a { color: #a78bfa; text-decoration: underline; }
+        .navbar { background: white; padding: 14px 5%; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 50; }
+        .logo { font-weight: 800; color: var(--primary); font-size: 1.4rem; text-decoration: none; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #7c3aed, #a78bfa); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; }
+        .step-badge { background: #ede9fe; color: #5b21b6; padding: 8px 18px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .wrapper { max-width: 950px; margin: 0 auto; padding: 25px 20px; flex: 1; width: 100%; }
+        .progress-steps { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
+        .step-dot { width: 14px; height: 14px; border-radius: 50%; background: #cbd5e1; transition: 0.3s; }
+        .step-dot.active { background: var(--primary); width: 16px; height: 16px; box-shadow: 0 0 0 5px rgba(124,58,237,0.2); }
+        .step-dot.done { background: var(--secondary); }
+        .step-line { width: 50px; height: 3px; background: #e2e8f0; border-radius: 3px; }
+        .step-line.done { background: var(--secondary); }
+        .timer-card { background: white; padding: 35px 25px; border-radius: 24px; box-shadow: 0 10px 25px -8px rgba(0,0,0,0.06); text-align: center; border: 1px solid #e2e8f0; margin-bottom: 25px; }
+        .timer-val { font-size: 4.5rem; font-weight: 800; color: var(--primary); margin: 8px 0; line-height: 1.2; letter-spacing: 2px; }
+        .progress-bg { background: #e2e8f0; height: 10px; border-radius: 20px; margin: 20px 0 10px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #7c3aed, #a78bfa); transition: 1s linear; border-radius: 20px; }
+        .content-block { background: white; padding: 28px 24px; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+        .content-block h2 { font-size: 1.35rem; margin-bottom: 12px; color: var(--dark); border-left: 4px solid var(--primary); padding-left: 14px; }
+        .content-block h3 { font-size: 1.1rem; margin: 16px 0 8px; color: #1e293b; }
+        .content-block p { color: #475569; font-size: 0.95rem; margin-bottom: 10px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 10px; margin: 16px 0 5px; }
+        .feature-item { background: #f8fafc; padding: 13px 12px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 0.88rem; display: flex; align-items: center; gap: 8px; }
+        .feature-item .icon { font-size: 1.2rem; }
+        .blog-section { background: var(--accent); border: 1px solid #ddd6fe; border-radius: 18px; padding: 24px; margin-bottom: 20px; }
+        .blog-section h3 { color: #5b21b6; margin-bottom: 10px; font-size: 1.1rem; }
+        .blog-section ul { list-style: none; padding: 0; }
+        .blog-section ul li { padding: 8px 0; border-bottom: 1px solid #ede9fe; font-size: 0.9rem; color: #334155; }
+        .blog-section ul li:last-child { border-bottom: none; }
+        .blog-section ul li::before { content: "✅ "; }
+        .btn-next { background: var(--secondary); color: white; padding: 16px 45px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; text-decoration: none; display: inline-block; cursor: pointer; transition: 0.3s; border: none; box-shadow: 0 8px 18px rgba(16,185,129,0.2); }
+        .btn-next:hover { transform: translateY(-2px); box-shadow: 0 14px 25px rgba(16,185,129,0.3); }
+        .final-area { text-align: center; padding: 25px 0 15px; }
+        footer { background: #0f172a; color: #94a3b8; padding: 35px 25px; text-align: center; margin-top: auto; border-radius: 24px 24px 0 0; }
+        .footer-links { display: flex; gap: 30px; justify-content: center; margin: 18px 0 12px; flex-wrap: wrap; }
+        .footer-links a { color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+        .footer-links a:hover { color: white; text-decoration: underline; }
+        .footer-contact { margin-top: 15px; font-size: 0.85rem; opacity: 0.8; }
+        .footer-contact i { margin: 0 6px; }
+        @media (max-width: 600px) { .timer-val { font-size: 3rem; } .wrapper { padding: 15px 12px; } .navbar { padding: 10px 4%; } }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        🛡️ Final security checks in progress • <a href="privacy.html">Your data is protected</a>
+    </div>
+
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <div class="logo-icon">🔗</div>
+            MyLinkShortner
+        </a>
+        <div class="step-badge">📋 Step 2 of 2</div>
+    </nav>
+
+    <div class="wrapper">
+        <div class="progress-steps">
+            <div class="step-dot done"></div>
+            <div class="step-line done"></div>
+            <div class="step-dot active"></div>
+        </div>
+
+        <!-- Monetag Ad Placement Zone -->
+        <div id="monetag-ad-top" style="min-height: 90px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px dashed #cbd5e1;">
+            <span style="color: #94a3b8; font-size: 0.8rem;">SPONSORED CONTENT</span>
+        </div>
+
+        <div class="timer-card">
+            <div id="status-text" style="font-weight: 700; color: var(--text); font-size: 1.2rem;">🔐 Performing Final Security Confirmation...</div>
+            <div class="timer-val" id="timer">20</div>
+            <div class="progress-bg"><div class="progress-fill" id="fill"></div></div>
+            <p id="sub-status" style="font-size: 0.95rem; color: var(--primary); font-weight: 600;">Validating destination integrity & preparing secure tunnel</p>
+            <p style="margin-top: 10px; color: #64748b; font-size: 0.85rem;">⏳ Final checks — almost done</p>
+        </div>
+
+        <!-- Blog Style Content Section 1 -->
+        <div class="blog-section">
+            <h3>📝 How We Ensure Your Online Safety</h3>
+            <p style="font-size:0.9rem; color:#334155; margin-bottom:12px;">At MyLinkShortner, we employ industry-leading security measures to protect every user who clicks on our shortened links. Here's what happens behind the scenes:</p>
+            <ul>
+                <li><strong>Certificate Validation:</strong> We verify SSL/TLS certificates of destination websites</li>
+                <li><strong>Content Scanning:</strong> Automated systems check for malicious content patterns</li>
+                <li><strong>Reputation Check:</strong> Cross-reference with global threat intelligence networks</li>
+                <li><strong>Real-time Monitoring:</strong> Continuous surveillance of emerging threats</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h2>🔏 End-to-End Encryption Verified</h2>
+            <p>Your connection is secured with AES-256 encryption. All data between you and the destination will be encrypted and protected from interception. We use military-grade encryption standards to ensure complete privacy.</p>
+            <div class="feature-grid">
+                <div class="feature-item"><span class="icon">🔐</span> TLS 1.3 Active</div>
+                <div class="feature-item"><span class="icon">🛡️</span> DDoS Protected</div>
+                <div class="feature-item"><span class="icon">✅</span> Certificate Valid</div>
+                <div class="feature-item"><span class="icon">🌐</span> Secure DNS</div>
+            </div>
+            <p style="margin-top: 14px;">🔍 <strong>Technical details:</strong> We use elliptic curve cryptography (ECC) for key exchange, ensuring forward secrecy. Your connection cannot be decrypted even if future keys are compromised.</p>
+        </div>
+
+        <!-- Blog Style Content Section 2 -->
+        <div class="blog-section">
+            <h3>📊 The Importance of Link Verification</h3>
+            <p style="font-size:0.9rem; color:#334155; margin-bottom:12px;">Did you know that over 30% of shortened links lead to potentially harmful content? At MyLinkShortner, we're changing that statistic through rigorous verification.</p>
+            <ul>
+                <li><strong>Transparency First:</strong> See destination previews before clicking</li>
+                <li><strong>Community Trust:</strong> Join millions of users who rely on our security</li>
+                <li><strong>Continuous Improvement:</strong> Our systems learn from new threats daily</li>
+                <li><strong>Open Standards:</strong> We use publicly auditable security protocols</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h2>🛑 Real-Time Threat Intelligence</h2>
+            <p>Our systems continuously monitor for emerging threats across the global internet. This destination has been scanned and cleared by our automated security pipeline, which processes millions of URLs daily.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px;">
+                <div style="flex: 1; min-width: 150px;">
+                    <h3>🦠 VirusTotal Integration</h3>
+                    <p style="font-size:0.88rem;">Destination URL scanned by 70+ antivirus engines</p>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <h3>🚫 Blacklist Monitoring</h3>
+                    <p style="font-size:0.88rem;">URL not found on any major blacklists</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monetag Ad Placement Zone 2 -->
+        <div id="monetag-ad-mid" style="min-height: 90px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px dashed #cbd5e1;">
+            <span style="color: #94a3b8; font-size: 0.8rem;">SPONSORED CONTENT</span>
+        </div>
+
+        <div class="final-area">
+            <a href="#" id="nextStepBtn" class="btn-next" style="display: none; background: #cbd5e1; cursor: not-allowed; pointer-events: none;">⏳ PLEASE WAIT...</a>
+            <p id="nextMsg" style="margin-top: 12px; color: #64748b; font-size: 0.9rem;">Button activates after all security checks complete</p>
+        </div>
+    </div>
+
+    <footer>
+        <div style="max-width:850px; margin:0 auto;">
+            <p style="font-weight: 700; color: #e2e8f0; font-size: 1.3rem;">🔗 MyLinkShortner</p>
+            <p style="margin-bottom: 12px; opacity:0.9; font-size:0.9rem;">Your safety is our mission • Verified & Trusted</p>
+            <div class="footer-links">
+                <a href="terms.html">📄 Terms of Service</a>
+                <a href="privacy.html">🔏 Privacy Policy</a>
+                <a href="contact.html">📧 Contact Us</a>
+                <a href="blog.html">📝 Security Blog</a>
+            </div>
+            <div class="footer-contact">
+                <i class="fas fa-envelope"></i> support@mylinkshortner.com • 
+                <i class="fas fa-shield-alt"></i> ISO 27001 Compliant • 
+                <i class="fas fa-globe"></i> Global CDN Network
+            </div>
+            <p style="margin-top: 15px; font-size:0.8rem; opacity:0.7;">© 2026 MyLinkShortner. All rights reserved. We adhere to strict privacy standards. No user data is sold or shared with third parties.</p>
+        </div>
+    </footer>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const linkId = urlParams.get('id');
+        
+        let time = 20;
+        const timerEl = document.getElementById('timer');
+        const fillEl = document.getElementById('fill');
+        const nextBtn = document.getElementById('nextStepBtn');
+        const nextMsg = document.getElementById('nextMsg');
+        const statusText = document.getElementById('status-text');
+        const subStatus = document.getElementById('sub-status');
+
+        if (!linkId) {
+            document.body.innerHTML = '<div style="text-align:center;padding:60px;"><h2>⚠️ Invalid Link</h2><p style="margin:15px 0;">No link ID was provided. Please check your URL and try again.</p><a href="javascript:history.back()" style="color:#7c3aed;">← Go Back</a></div>';
+        }
+
+        const countdown = setInterval(() => {
+            time--;
+            timerEl.innerText = time;
+            fillEl.style.width = ((20 - time) / 20 * 100) + "%";
+
+            if (time <= 12 && time > 6) {
+                subStatus.innerHTML = "🔍 Performing deep security analysis of destination...";
+            } else if (time <= 6 && time > 0) {
+                subStatus.innerHTML = "✅ Final checks passed! Preparing secure redirect...";
+            }
+
+            if (time <= 0) {
+                clearInterval(countdown);
+                timerEl.innerText = "0";
+                statusText.innerHTML = "✅ All Security Checks Passed — Ready!";
+                statusText.style.color = "#10b981";
+                subStatus.innerHTML = "🎉 Final confirmation complete! Access your link now.";
+                
+                nextBtn.style.display = 'inline-block';
+                nextBtn.style.background = '#10b981';
+                nextBtn.style.cursor = 'pointer';
+                nextBtn.style.pointerEvents = 'auto';
+                nextBtn.innerHTML = '🔓 ACCESS YOUR DESTINATION →';
+                nextMsg.innerHTML = '✅ All verifications passed — click the button above';
+            }
+        }, 1000);
+
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (time <= 0 && linkId) {
+                window.location.href = `final.html?id=${encodeURIComponent(linkId)}`;
+            }
+        });
+    </script>
+</body>
+</html>
