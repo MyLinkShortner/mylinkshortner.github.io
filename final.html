@@ -9,30 +9,77 @@
     <style>
         :root { --primary: #2563eb; --secondary: #10b981; --dark: #0f172a; --text: #475569; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #f8fafc; color: var(--dark); line-height: 1.6; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .container { background: white; border-radius: 28px; padding: 50px 30px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 25px 40px -12px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        body { background: #f8fafc; color: var(--dark); line-height: 1.6; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .main-wrapper { max-width: 900px; width: 100%; margin: 0 auto; }
+        .container { background: white; border-radius: 28px; padding: 40px 30px; text-align: center; max-width: 550px; width: 100%; margin: 0 auto; box-shadow: 0 25px 40px -12px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
         .title { font-size: 1.8rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
-        .subtitle { font-size: 0.95rem; color: #64748b; margin-bottom: 30px; }
+        .subtitle { font-size: 0.95rem; color: #64748b; margin-bottom: 20px; }
         .timer-display { font-size: 5rem; font-weight: 800; color: var(--secondary); margin: 20px 0; line-height: 1; }
         .progress-bg { background: #e2e8f0; height: 10px; border-radius: 20px; margin: 20px 0; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: var(--secondary); transition: 1s linear; border-radius: 20px; }
         .btn-getlink { background: #cbd5e1; color: white; padding: 18px 45px; border-radius: 50px; font-weight: 700; font-size: 1.2rem; text-decoration: none; display: inline-block; cursor: not-allowed; pointer-events: none; transition: 0.3s; border: none; }
         .btn-getlink.active { background: var(--secondary); cursor: pointer; pointer-events: auto; box-shadow: 0 12px 25px rgba(16,185,129,0.3); }
         .btn-getlink.active:hover { transform: scale(1.03); }
+        
+        /* Ad containers */
+        .ad-top { text-align: center; margin-bottom: 20px; background: #fff; border-radius: 16px; padding: 10px; border: 1px solid #eef2f6; max-width: 750px; margin-left: auto; margin-right: auto; }
+        .ad-bottom { text-align: center; margin-top: 20px; background: #fff; border-radius: 16px; padding: 10px; border: 1px solid #eef2f6; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .ad-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; background: #f1f5f9; display: inline-block; padding: 2px 10px; border-radius: 30px; margin-bottom: 8px; }
+        
+        @media (max-width: 600px) {
+            .container { padding: 30px 20px; }
+            .timer-display { font-size: 3.5rem; }
+            .ad-top, .ad-bottom { padding: 8px; }
+        }
     </style>
 </head>
 <body>
+    <div class="main-wrapper">
+        <!-- Banner 728x90 Ad - Above the timer (First ad) -->
+        <div class="ad-top">
+            <div class="ad-label">📢 Advertisement</div>
+            <div id="ad728x90_container">
+                <script>
+                    atOptions = {
+                        'key' : 'ff5b1355d976bc37cd1b0c8bbf1f2178',
+                        'format' : 'iframe',
+                        'height' : 90,
+                        'width' : 728,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://www.highperformanceformat.com/ff5b1355d976bc37cd1b0c8bbf1f2178/invoke.js"></script>
+            </div>
+        </div>
 
-    <div class="container">
-        <div class="title">🔐 Almost Ready</div>
-        <div class="subtitle">Preparing your secure destination...</div>
-        
-        <div class="timer-display" id="timer">10</div>
-        <div class="progress-bg"><div class="progress-fill" id="fill"></div></div>
-        
-        <p id="status-msg" style="color: #64748b; margin-bottom: 25px; font-size: 0.9rem;">Finalizing security • 10 seconds</p>
-        
-        <a href="#" id="getLinkBtn" class="btn-getlink">⏳ PLEASE WAIT...</a>
+        <div class="container">
+            <div class="title">🔐 Almost Ready</div>
+            <div class="subtitle">Preparing your secure destination...</div>
+            
+            <div class="timer-display" id="timer">10</div>
+            <div class="progress-bg"><div class="progress-fill" id="fill"></div></div>
+            
+            <p id="status-msg" style="color: #64748b; margin-bottom: 25px; font-size: 0.9rem;">Finalizing security • 10 seconds</p>
+            
+            <a href="#" id="getLinkBtn" class="btn-getlink">⏳ PLEASE WAIT...</a>
+        </div>
+
+        <!-- Banner 468x60 Ad - Below the timer (Second ad) -->
+        <div class="ad-bottom">
+            <div class="ad-label">📢 Advertisement</div>
+            <div id="ad468x60_container">
+                <script>
+                    atOptions = {
+                        'key' : '05229fe879758763e7a7ab19e956ebdb',
+                        'format' : 'iframe',
+                        'height' : 60,
+                        'width' : 468,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://www.highperformanceformat.com/05229fe879758763e7a7ab19e956ebdb/invoke.js"></script>
+            </div>
+        </div>
     </div>
 
     <script type="module">
