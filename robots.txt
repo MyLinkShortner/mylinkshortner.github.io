@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://mylinkshortner.github.io/sitemap.xml
