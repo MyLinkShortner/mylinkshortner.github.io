@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOONZI Publisher Link Shortener - Monetize Your Links | Free & Secure</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://toonzi.xyz/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="https://toonzi.xyz/favicon.ico">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="TOONZI Publisher Link Shortener - Shorten your links and earn money from social traffic. Monetize your links with our publisher platform.">
+    <meta name="keywords" content="link shortener, publisher link shortener, earn from links, monetize links, TOONZI, social traffic, link monetization">
+    <link rel="canonical" href="https://toonzi.xyz/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="TOONZI Publisher Link Shortener - Monetize Your Social Traffic">
+    <meta property="og:description" content="Shorten your links and earn money from social traffic. Join TOONZI Publisher platform today.">
+    <meta property="og:url" content="https://toonzi.xyz/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TOONZI Publisher">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TOONZI Publisher Link Shortener - Monetize Your Social Traffic">
+    <meta name="twitter:description" content="Shorten your links and earn money from social traffic. Join TOONZI Publisher platform today.">
+
+    <!-- Robots -->
+    <meta name="robots" content="index, follow">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #0f172a;
+        }
+
+        /* ============================================ */
+        /* TOP BANNER - TOONZI PUBLISHER               */
+        /* ✅ Sticky REMOVED                           */
+        /* ============================================ */
+        .top-banner {
+            background: #0f172a;
+            padding: 14px 20px;
+            text-align: center;
+            border-bottom: 3px solid #ffcc00;
+            /* ✅ position: sticky REMOVED */
+        }
+
+        .top-banner .brand {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .top-banner .brand span {
+            color: #ffcc00;
+        }
+
+        .top-banner .tagline {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+            letter-spacing: 1px;
+        }
+
+        /* ============================================ */
+        /* HERO SECTION                                */
+        /* ============================================ */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 60px 20px 70px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 204, 0, 0.03);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero .badge {
+            display: inline-block;
+            padding: 6px 20px;
+            background: rgba(255, 204, 0, 0.12);
+            border: 1px solid rgba(255, 204, 0, 0.15);
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ffcc00;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 44px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 span {
+            color: #ffcc00;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(255,255,255,0.5);
+            max-width: 550px;
+            margin: 0 auto 30px;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================ */
+        /* GOOGLE LOGIN BUTTON - HERO                  */
+        /* ============================================ */
+        .hero-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-google-hero {
+            padding: 16px 48px;
+            background: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .btn-google-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 204, 0, 0.15);
+        }
+
+        .btn-google-hero i {
+            font-size: 20px;
+            color: #ea4335;
+        }
+
+        .hero-buttons .or-divider {
+            color: rgba(255,255,255,0.2);
+            font-size: 13px;
+            letter-spacing: 2px;
+        }
+
+        .btn-scroll-down {
+            padding: 12px 32px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-scroll-down:hover {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* ============================================ */
+        /* AUTH SECTION                                */
+        /* ============================================ */
+        .auth-section {
+            padding: 50px 20px 60px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .auth-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            border: 1px solid #eef2f6;
+        }
+
+        .auth-card .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .auth-card .card-title span {
+            color: #ffcc00;
+        }
+
+        .auth-card .card-sub {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 5px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .social-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+        }
+
+        .social-btn:hover {
+            background: #f8fafc;
+            border-color: #ffcc00;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 16px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 50px);
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .divider span {
+            background: #ffffff;
+            padding: 0 12px;
+            color: #94a3b8;
+            font-size: 0.7rem;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #0f172a;
+            font-size: 0.8rem;
+        }
+
+        .form-group label .required {
+            color: #e74c3c;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.08);
+        }
+
+        /* Terms & Privacy Checkbox */
+        .terms-group {
+            margin: 16px 0 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .terms-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ffcc00;
+            cursor: pointer;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .terms-group label {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .terms-group label a {
+            color: #0f172a;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .terms-group label a:hover {
+            color: #ffcc00;
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 4px;
+        }
+
+        .submit-btn:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .forgot-password a {
+            font-size: 12px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .forgot-password a:hover {
+            color: #0f172a;
+        }
+
+        /* ============================================ */
+        /* FEATURES SECTION                            */
+        /* ============================================ */
+        .features-section {
+            padding: 50px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .features-section .section-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .features-section .section-title span {
+            color: #ffcc00;
+        }
+
+        .features-section .section-sub {
+            text-align: center;
+            color: #64748b;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #eef2f6;
+            border-radius: 16px;
+            padding: 28px 24px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.04);
+            border-color: #ffcc00;
+        }
+
+        .feature-card .icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 204, 0, 0.08);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 24px;
+            color: #ffcc00;
+        }
+
+        .feature-card h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* ============================================ */
+        /* FOOTER                                      */
+        /* ============================================ */
+        .footer {
+            text-align: center;
+            padding: 25px 20px;
+            border-top: 1px solid #eef2f6;
+            background: #ffffff;
+        }
+
+        .footer p {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .footer p a {
+            color: #0f172a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer .footer-links {
+            margin-top: 6px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer .footer-links a {
+            font-size: 12px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer .footer-links a:hover {
+            color: #0f172a;
+        }
+
+        /* ============================================ */
+        /* RESPONSIVE                                  */
+        /* ============================================ */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .btn-google-hero {
+                padding: 14px 32px;
+                font-size: 15px;
+            }
+
+            .auth-card {
+                padding: 1.8rem;
+            }
+
+            .features-section .section-title {
+                font-size: 26px;
+            }
+
+            .top-banner .brand {
+                font-size: 18px;
+            }
+
+            .top-banner .tagline {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            .hero {
+                padding: 40px 16px 50px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-card {
+                padding: 1.4rem;
+            }
+
+            .btn-google-hero {
+                padding: 12px 24px;
+                font-size: 14px;
+                width: 100%;
+            }
+
+            .btn-scroll-down {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- TOP BANNER - TOONZI PUBLISHER              -->
+    <!-- ✅ Sticky REMOVED                         -->
+    <!-- ✅ Tagline Updated                        -->
+    <!-- ========================================== -->
+    <div class="top-banner">
+        <div class="brand">TOON<span>ZI</span></div>
+        <div class="tagline">Monetize Your Social Traffic</div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- HERO SECTION                               -->
+    <!-- ========================================== -->
+    <section class="hero" id="hero">
+        <div class="badge"><i class="fas fa-money-bill-wave"></i> Earn from Your Links</div>
+        <h1>Shorten Links. <span>Earn Money.</span></h1>
+        <p>Monetize your social media traffic. Every click on your short links earns you revenue. Only social traffic counts — no bots, no spam.</p>
+
+        <div class="hero-buttons">
+            <button class="btn-google-hero" onclick="handleGoogleLogin()">
+                <i class="fab fa-google"></i> Continue with Google
+            </button>
+
+            <div class="or-divider">— OR —</div>
+
+            <button class="btn-scroll-down" onclick="scrollToAuth()">
+                <i class="fas fa-arrow-down"></i> Sign Up with Email
+            </button>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- AUTH SECTION                               -->
+    <!-- ========================================== -->
+    <section class="auth-section" id="authSection">
+        <div class="auth-card">
+            <div class="card-title">Welcome to <span>TOONZI</span></div>
+            <div class="card-sub" id="authSubText">Create your publisher account and start earning</div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('signup')">Sign Up</button>
+                <button class="tab-btn" onclick="switchTab('login')">Login</button>
+            </div>
+
+            <button class="social-btn" onclick="handleGoogleLogin()">
+                <i class="fab fa-google" style="color:#ea4335;"></i>
+                Continue with Google
+            </button>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupForm">
+                <div class="form-group">
+                    <label>Full Name <span class="required">*</span></label>
+                    <input type="text" id="signupName" placeholder="e.g., John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" id="signupEmail" placeholder="you@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Password <span class="required">*</span></label>
+                    <input type="password" id="signupPassword" placeholder="Min 6 characters">
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password <span class="required">*</span></label>
+                    <input type="password" id="signupConfirmPassword" placeholder="Re-enter your password">
+                </div>
+
+                <div class="terms-group">
+                    <input type="checkbox" id="termsCheck">
+                    <label for="termsCheck">
+                        I have read and agree to the 
+                        <a href="terms-and-condition.html" target="_blank">Terms & Condition</a> 
+                        and 
+                        <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button class="submit-btn" id="signupBtn">Create Publisher Account</button>
+
+                <div style="text-align:center;margin-top:12px;font-size:13px;color:#94a3b8;">
+                    Already have an account? <a href="#" onclick="switchTab('login');return false;" style="color:#0f172a;font-weight:600;text-decoration:none;">Login</a>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" style="display:none;">
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Password <span class="required">*</span></label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                </div>
+
+                <div class="forgot-password">
+                    <a onclick="handleForgotPassword()">Forgot Password?</a>
+                </div>
+
+                <button class="submit-btn" id="loginBtn" style="margin-top:10px;">Sign In</button>
+
+                <div style="text-align:center;margin-top:12px;font-size:13px;color:#94a3b8;">
+                    Don't have an account? <a href="#" onclick="switchTab('signup');return false;" style="color:#0f172a;font-weight:600;text-decoration:none;">Sign Up</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- FEATURES SECTION                           -->
+    <!-- ========================================== -->
+    <section class="features-section">
+        <h2 class="section-title">Why Join <span>TOONZI Publisher</span>?</h2>
+        <p class="section-sub">Everything you need to monetize your social media traffic</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                <h3>Earn Per Click</h3>
+                <p>Every legitimate click on your short links earns you revenue. Only social traffic counts.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Anti-Bot Protection</h3>
+                <p>Our advanced system filters bot traffic automatically. You only get paid for real clicks.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon"><i class="fas fa-chart-line"></i></div>
+                <h3>Real-Time Analytics</h3>
+                <p>Track your clicks, earnings, and performance in real-time from your dashboard.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon"><i class="fas fa-infinity"></i></div>
+                <h3>Unlimited Links</h3>
+                <p>Create as many short links as you want. No limits, no hidden fees.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon"><i class="fas fa-globe"></i></div>
+                <h3>Social Traffic Only</h3>
+                <p>We only count traffic from social media platforms. No bots, no paid traffic, no spam.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon"><i class="fas fa-wallet"></i></div>
+                <h3>Easy Withdrawals</h3>
+                <p>Withdraw your earnings easily when you reach the minimum threshold.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- FOOTER                                     -->
+    <!-- ========================================== -->
+    <footer class="footer">
+        <p>&copy; 2026 <a href="https://toonzi.xyz">TOONZI</a>. All Rights Reserved.</p>
+        <div class="footer-links">
+            <a href="terms-and-condition.html">Terms & Condition</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="#" onclick="showSupport()">Support</a>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- TOAST NOTIFICATION                         -->
+    <!-- ========================================== -->
+    <div style="position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);padding:14px 30px;background:#0f172a;border-radius:12px;color:#fff;font-size:14px;z-index:999;opacity:0;transition:0.5s cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center;gap:10px;box-shadow:0 20px 50px rgba(0,0,0,0.3);font-family:'Inter',sans-serif;" id="toast">
+        <i class="fas fa-check-circle" style="color:#27ae60;font-size:18px;"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FIREBASE & JAVASCRIPT                      -->
+    <!-- ========================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword,
+            sendPasswordResetEmail,
+            sendEmailVerification
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABekPzR4zxlY8rws16hyYNmFlMXBcggXk",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentMode = 'signup';
+
+        // ============================================
+        // SWITCH TAB
+        // ============================================
+        window.switchTab = (mode) => {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            const signupForm = document.getElementById('signupForm');
+            const loginForm = document.getElementById('loginForm');
+            const subText = document.getElementById('authSubText');
+
+            if(mode === 'login') {
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                subText.textContent = 'Sign in to your publisher account';
+            } else {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+                signupForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                subText.textContent = 'Create your publisher account and start earning';
+            }
+        };
+
+        // ============================================
+        // SCROLL TO AUTH
+        // ============================================
+        window.scrollToAuth = () => {
+            document.getElementById('authSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        // ============================================
+        // GOOGLE LOGIN
+        // ============================================
+        window.handleGoogleLogin = async () => {
+            try {
+                showToast('Connecting to Google...', 'info');
+
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                const userRef = doc(db, "publishers", user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (!userSnap.exists()) {
+                    await setDoc(userRef, {
+                        name: user.displayName || 'Publisher',
+                        email: user.email,
+                        photoURL: user.photoURL || '',
+                        createdAt: new Date().toISOString(),
+                        totalLinks: 0,
+                        totalClicks: 0,
+                        totalEarnings: 0
+                    });
+                }
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Welcome to TOONZI Publisher!',
+                    text: `Hello ${user.displayName || user.email}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                setTimeout(() => {
+                    window.location.href = "publisher-dashboard.html";
+                }, 2000);
+                
+            } catch (error) {
+                showUserFriendlyError(error);
+            }
+        };
+
+        // ============================================
+        // SIGNUP
+        // ============================================
+        document.getElementById('signupBtn').addEventListener('click', async () => {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            const termsChecked = document.getElementById('termsCheck').checked;
+
+            if (!name) {
+                showError('Please enter your full name');
+                return;
+            }
+
+            if (!email) {
+                showError('Please enter your email address');
+                return;
+            }
+
+            if (!email.includes('@') || !email.includes('.')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            if (!password) {
+                showError('Please create a password');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match. Please try again.');
+                return;
+            }
+
+            if (!termsChecked) {
+                showError('Please read and agree to the Terms & Condition and Privacy Policy');
+                return;
+            }
+
+            try {
+                showToast('Creating your account...', 'info');
+                
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await sendEmailVerification(user);
+
+                await setDoc(doc(db, "publishers", user.uid), {
+                    name: name,
+                    email: email,
+                    createdAt: new Date().toISOString(),
+                    totalLinks: 0,
+                    totalClicks: 0,
+                    totalEarnings: 0,
+                    emailVerified: false
+                });
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Account Created Successfully!',
+                    html: 'Please check your email to verify your account.<br><br><strong>Note:</strong> You must verify your email before you can login.',
+                    confirmButtonColor: '#0f172a'
+                });
+
+                switchTab('login');
+
+            } catch (error) {
+                showUserFriendlyError(error);
+            }
+        });
+
+        // ============================================
+        // LOGIN
+        // ============================================
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email) {
+                showError('Please enter your email address');
+                return;
+            }
+
+            if (!password) {
+                showError('Please enter your password');
+                return;
+            }
+
+            try {
+                showToast('Signing in...', 'info');
+                
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                if (!user.emailVerified) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Email Not Verified',
+                        html: 'Please verify your email address before logging in.<br><br>Click below to resend the verification email.',
+                        confirmButtonText: 'Resend Verification',
+                        confirmButtonColor: '#0f172a',
+                        showCancelButton: true,
+                        cancelButtonText: 'Cancel'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            await sendEmailVerification(user);
+                            Swal.fire('Sent!', 'Verification email resent successfully.', 'success');
+                        }
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Successful!',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                setTimeout(() => {
+                    window.location.href = "publisher-dashboard.html";
+                }, 1500);
+
+            } catch (error) {
+                showUserFriendlyError(error);
+            }
+        });
+
+        // ============================================
+        // FORGOT PASSWORD
+        // ============================================
+        window.handleForgotPassword = async () => {
+            const { value: email } = await Swal.fire({
+                title: 'Reset Password',
+                text: 'Enter your email address to receive a password reset link.',
+                input: 'email',
+                inputPlaceholder: 'you@example.com',
+                confirmButtonColor: '#0f172a',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel'
+            });
+
+            if (!email) return;
+
+            if (!email.includes('@') || !email.includes('.')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            try {
+                showToast('Sending reset link...', 'info');
+                await sendPasswordResetEmail(auth, email);
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Reset Link Sent!',
+                    text: `We've sent a password reset link to ${email}. Please check your inbox.`,
+                    confirmButtonColor: '#0f172a'
+                });
+            } catch (error) {
+                showUserFriendlyError(error);
+            }
+        };
+
+        // ============================================
+        // USER-FRIENDLY ERROR HANDLING
+        // ============================================
+        function showUserFriendlyError(error) {
+            let message = 'Something went wrong. Please try again.';
+            
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    message = 'This email is already registered. Please login instead.';
+                    break;
+                case 'auth/invalid-credential':
+                    message = 'Invalid email or password. Please check your credentials.';
+                    break;
+                case 'auth/user-not-found':
+                    message = 'No account found with this email. Please sign up first.';
+                    break;
+                case 'auth/wrong-password':
+                    message = 'Incorrect password. Please try again.';
+                    break;
+                case 'auth/weak-password':
+                    message = 'Password is too weak. Please use at least 6 characters.';
+                    break;
+                case 'auth/too-many-requests':
+                    message = 'Too many failed attempts. Please try again later.';
+                    break;
+                case 'auth/popup-closed-by-user':
+                    message = 'Google login was cancelled. Please try again.';
+                    break;
+                case 'auth/cancelled-popup-request':
+                    message = 'Login was cancelled. Please try again.';
+                    break;
+                case 'auth/network-request-failed':
+                    message = 'Network error. Please check your internet connection.';
+                    break;
+                default:
+                    message = error.message || 'An unexpected error occurred. Please try again.';
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops!',
+                text: message,
+                confirmButtonColor: '#0f172a'
+            });
+        }
+
+        function showError(message) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: message,
+                confirmButtonColor: '#0f172a'
+            });
+        }
+
+        // ============================================
+        // TOAST NOTIFICATION
+        // ============================================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const icon = toast.querySelector('i');
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle';
+                icon.style.color = '#e74c3c';
+            } else if (type === 'info') {
+                icon.className = 'fas fa-info-circle';
+                icon.style.color = '#3498db';
+            } else {
+                icon.className = 'fas fa-check-circle';
+                icon.style.color = '#27ae60';
+            }
+            
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(100px)';
+            }, 3000);
+        }
+
+        // ============================================
+        // SUPPORT
+        // ============================================
+        window.showSupport = () => {
+            Swal.fire({
+                title: 'TOONZI Publisher Support',
+                html: `
+                    <p style="text-align:left;color:#64748b;">
+                        <strong>📧 Email:</strong> vansh3725793@gmail.com<br>
+                        <strong>⏰ Response Time:</strong> Within 24 hours<br>
+                        <strong>📅 Support Days:</strong> Monday - Friday<br>
+                        <strong>🕐 Hours:</strong> 9:00 AM - 6:00 PM EST
+                    </p>
+                    <div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;font-size:13px;color:#64748b;">
+                        <i class="fas fa-info-circle" style="color:#ffcc00;"></i>
+                        For urgent issues, please mention "URGENT" in your email subject.
+                    </div>
+                `,
+                confirmButtonColor: '#0f172a'
+            });
+        };
+
+        // ============================================
+        // ENTER KEY SUPPORT
+        // ============================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (currentMode === 'signup') {
+                    document.getElementById('signupBtn').click();
+                } else {
+                    document.getElementById('loginBtn').click();
+                }
+            }
+        });
+
+        // ============================================
+        // INIT - Default to Signup
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            switchTab('signup');
+        });
+
+    </script>
+
+</body>
+</html>
