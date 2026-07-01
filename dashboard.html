@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOONZI Publisher Dashboard - Manage Your Links</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://toonzi.xyz/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="https://toonzi.xyz/favicon.ico">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="TOONZI Publisher Dashboard - Manage your short links, create new links, and track your performance. Professional link management platform.">
+    <meta name="keywords" content="link shortener dashboard, publisher dashboard, link management, TOONZI, short links">
+    <link rel="canonical" href="https://toonzi.xyz/dashboard.html">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        /* ============================================ */
+        /* RESET & BASE                                */
+        /* ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #0f172a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============================================ */
+        /* DASHBOARD HEADER                            */
+        /* ============================================ */
+        .dashboard-header {
+            background: #ffffff;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eef2f6;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #0f172a;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .hamburger-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .hamburger-btn .bar {
+            width: 24px;
+            height: 2.5px;
+            background: #0f172a;
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .header-center .logo-icon {
+            font-size: 22px;
+            color: #ffcc00;
+        }
+
+        .header-center .brand-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        .header-center .brand-text span {
+            color: #ffcc00;
+        }
+
+        .header-center .brand-sub {
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 400;
+            display: block;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: -2px;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 8px 4px 4px;
+            border-radius: 50px;
+            background: #f1f5f9;
+            transition: all 0.3s;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .profile-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .profile-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffcc00;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .profile-btn .chevron {
+            font-size: 12px;
+            color: #94a3b8;
+            padding-right: 4px;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 20px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            min-width: 240px;
+            border: 1px solid #eef2f6;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 200;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-dropdown .dropdown-item {
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .profile-dropdown .dropdown-item:hover {
+            background: #f1f5f9;
+        }
+
+        .profile-dropdown .dropdown-item.logout {
+            color: #dc2626;
+            border-top: 1px solid #eef2f6;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .profile-dropdown .dropdown-header {
+            padding: 16px 18px 12px;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .profile-dropdown .dropdown-header .email {
+            font-size: 12px;
+            color: #94a3b8;
+            word-break: break-all;
+        }
+
+        .profile-dropdown .dropdown-header .name {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 15px;
+        }
+
+        .profile-container {
+            position: relative;
+        }
+
+        /* ============================================ */
+        /* SIDEBAR                                      */
+        /* ============================================ */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 300;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 301;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 30px rgba(0,0,0,0.05);
+            padding: 24px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #eef2f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar .sidebar-header .brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .sidebar .sidebar-header .brand span {
+            color: #ffcc00;
+        }
+
+        .sidebar .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .sidebar .sidebar-close:hover {
+            color: #0f172a;
+        }
+
+        .sidebar .menu-items {
+            padding: 16px 12px;
+        }
+
+        .sidebar .menu-items .menu-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #94a3b8;
+            padding: 8px 14px 4px;
+            font-weight: 600;
+        }
+
+        .sidebar .menu-items a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 10px;
+            transition: 0.3s;
+            cursor: default;
+        }
+
+        .sidebar .menu-items a:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .sidebar .menu-items a i {
+            width: 20px;
+            font-size: 16px;
+            color: #94a3b8;
+        }
+
+        .sidebar .menu-items a.active {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .sidebar .menu-items a.active i {
+            color: #ffcc00;
+        }
+
+        .sidebar .menu-items .divider {
+            border-top: 1px solid #eef2f6;
+            margin: 12px 16px;
+        }
+
+        /* ============================================ */
+        /* MAIN CONTAINER                              */
+        /* ============================================ */
+        .main-container {
+            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px 40px;
+            width: 100%;
+        }
+
+        /* ============================================ */
+        /* WALLET CARD                                 */
+        /* ============================================ */
+        .wallet-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .wallet-card .wallet-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .wallet-card .wallet-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 204, 0, 0.12);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #ffcc00;
+        }
+
+        .wallet-card .wallet-info .label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .wallet-card .wallet-info .balance {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .wallet-card .wallet-info .balance span {
+            color: #ffcc00;
+        }
+
+        .wallet-card .wallet-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-card .wallet-right .status-badge {
+            padding: 6px 16px;
+            background: rgba(39, 174, 96, 0.15);
+            border: 1px solid rgba(39, 174, 96, 0.2);
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        .wallet-card .wallet-right .status-badge i {
+            margin-right: 6px;
+        }
+
+        /* ============================================ */
+        /* CREATE LINK CARD                            */
+        /* ============================================ */
+        .create-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 28px 32px;
+            border: 1px solid #eef2f6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            margin-bottom: 30px;
+        }
+
+        .create-card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .create-card h2 i {
+            color: #ffcc00;
+            margin-right: 10px;
+        }
+
+        .create-card .sub {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .form-group input {
+            flex: 2;
+            min-width: 250px;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: 0.3s;
+            background: #fafbfc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffcc00;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.06);
+        }
+
+        .form-group select {
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #fafbfc;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            min-width: 160px;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #ffcc00;
+        }
+
+        .btn-primary {
+            padding: 14px 28px;
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ============================================ */
+        /* LINKS LIST                                  */
+        /* ============================================ */
+        .links-section {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px 28px;
+            border: 1px solid #eef2f6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .links-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .links-header h3 i {
+            color: #ffcc00;
+            margin-right: 10px;
+        }
+
+        .links-header .badge {
+            padding: 4px 14px;
+            background: #f1f5f9;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .links-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .link-card {
+            background: #f8fafc;
+            border: 1px solid #eef2f6;
+            border-radius: 14px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .link-card:hover {
+            border-color: #ffcc00;
+            background: #fafbfc;
+        }
+
+        .link-card .link-url {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 14px;
+            word-break: break-all;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .link-card .link-url i {
+            color: #ffcc00;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+
+        .link-card .link-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .link-card .link-meta .clicks {
+            font-size: 13px;
+            color: #64748b;
+            background: #ffffff;
+            padding: 2px 12px;
+            border-radius: 50px;
+            border: 1px solid #eef2f6;
+        }
+
+        .link-card .link-meta .clicks i {
+            color: #ffcc00;
+            margin-right: 4px;
+        }
+
+        .link-card .link-meta .status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 50px;
+        }
+
+        .link-card .link-meta .status.active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .link-card .link-meta .status.inactive {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .link-card .link-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .link-card .link-actions button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .link-card .link-actions .copy-btn {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .link-card .link-actions .copy-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .link-card .link-actions .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .link-card .link-actions .delete-btn:hover {
+            background: #fecaca;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            color: #e2e8f0;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .view-all-link {
+            text-align: center;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #eef2f6;
+        }
+
+        .view-all-link a {
+            color: #0f172a;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .view-all-link a:hover {
+            color: #ffcc00;
+        }
+
+        .view-all-link a i {
+            margin-left: 6px;
+        }
+
+        /* ============================================ */
+        /* FOOTER                                      */
+        /* ============================================ */
+        .footer {
+            background: #ffffff;
+            padding: 24px 20px 20px;
+            border-top: 1px solid #eef2f6;
+            margin-top: auto;
+        }
+
+        .footer .footer-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .footer .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .footer .footer-links a:hover {
+            color: #0f172a;
+        }
+
+        .footer .footer-links a i {
+            margin-right: 4px;
+        }
+
+        .footer .footer-bottom p {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .footer .footer-bottom p a {
+            color: #0f172a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* ============================================ */
+        /* TOAST                                       */
+        /* ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 14px 30px;
+            background: #0f172a;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            z-index: 999;
+            opacity: 0;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            font-size: 18px;
+        }
+
+        .toast .success-icon {
+            color: #27ae60;
+        }
+
+        /* ============================================ */
+        /* RESPONSIVE                                  */
+        /* ============================================ */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 12px 16px;
+            }
+
+            .header-center {
+                position: static;
+                transform: none;
+            }
+
+            .header-center .brand-text {
+                font-size: 17px;
+            }
+
+            .wallet-card {
+                padding: 20px 18px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .wallet-card .wallet-left {
+                flex-direction: column;
+            }
+
+            .wallet-card .wallet-info .balance {
+                font-size: 26px;
+            }
+
+            .create-card {
+                padding: 20px 16px;
+            }
+
+            .form-group {
+                flex-direction: column;
+            }
+
+            .form-group input {
+                min-width: 100%;
+            }
+
+            .form-group select {
+                width: 100%;
+            }
+
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .links-section {
+                padding: 16px 14px;
+            }
+
+            .link-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .link-card .link-meta {
+                justify-content: flex-start;
+            }
+
+            .link-card .link-actions {
+                justify-content: flex-end;
+            }
+
+            .sidebar {
+                width: 260px;
+                left: -260px;
+            }
+
+            .footer .footer-links {
+                gap: 12px;
+            }
+
+            .footer .footer-links a {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-header {
+                padding: 10px 12px;
+            }
+
+            .header-center .brand-text {
+                font-size: 15px;
+            }
+
+            .header-center .logo-icon {
+                font-size: 18px;
+            }
+
+            .profile-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+
+            .wallet-card .wallet-info .balance {
+                font-size: 22px;
+            }
+
+            .wallet-card .wallet-icon {
+                width: 46px;
+                height: 46px;
+                font-size: 20px;
+            }
+
+            .create-card h2 {
+                font-size: 17px;
+            }
+
+            .sidebar {
+                width: 240px;
+                left: -240px;
+            }
+
+            .footer .footer-links {
+                gap: 8px;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- DASHBOARD HEADER                          -->
+    <!-- ========================================== -->
+    <header class="dashboard-header">
+        <!-- Left: Hamburger -->
+        <button class="hamburger-btn" onclick="toggleSidebar()">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+
+        <!-- Center: TOONZI Publisher -->
+        <div class="header-center">
+            <span class="logo-icon"><i class="fas fa-link"></i></span>
+            <div>
+                <div class="brand-text">TOON<span>ZI</span></div>
+                <span class="brand-sub">Publisher</span>
+            </div>
+        </div>
+
+        <!-- Right: Profile Avatar Only -->
+        <div class="profile-container">
+            <button class="profile-btn" onclick="toggleProfileDropdown()">
+                <div class="profile-avatar" id="profileAvatar">T</div>
+                <span class="chevron"><i class="fas fa-chevron-down"></i></span>
+            </button>
+
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-header">
+                    <div class="name" id="dropdownName">User</div>
+                    <div class="email" id="dropdownEmail">user@example.com</div>
+                </div>
+                <button class="dropdown-item" onclick="showProfileDetails()">
+                    <i class="fas fa-user-circle"></i> My Profile
+                </button>
+                <button class="dropdown-item" onclick="window.location.href='terms-and-condition.html'">
+                    <i class="fas fa-file-contract"></i> Terms
+                </button>
+                <button class="dropdown-item" onclick="window.location.href='privacy-policy.html'">
+                    <i class="fas fa-lock"></i> Privacy
+                </button>
+                <button class="dropdown-item" onclick="showSupport()">
+                    <i class="fas fa-headset"></i> Support
+                </button>
+                <button class="dropdown-item logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- SIDEBAR                                    -->
+    <!-- ========================================== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">TOON<span>ZI</span></div>
+            <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="menu-items">
+            <div class="menu-label">Main Menu</div>
+            <a href="#" class="active" style="cursor:default;">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="analytics.html">
+                <i class="fas fa-chart-line"></i> Analytics
+            </a>
+            <div class="divider"></div>
+            <div class="menu-label">Tools</div>
+            <a href="#" style="cursor:default;">
+                <i class="fas fa-link"></i> Link Shortener
+            </a>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MAIN CONTAINER                             -->
+    <!-- ========================================== -->
+    <div class="main-container">
+
+        <!-- ========================================== -->
+        <!-- WALLET CARD                                -->
+        <!-- ========================================== -->
+        <div class="wallet-card">
+            <div class="wallet-left">
+                <div class="wallet-icon"><i class="fas fa-wallet"></i></div>
+                <div class="wallet-info">
+                    <div class="label">Available Balance</div>
+                    <div class="balance">$<span id="walletBalance">0.00</span></div>
+                </div>
+            </div>
+            <div class="wallet-right">
+                <span class="status-badge"><i class="fas fa-check-circle"></i> Active</span>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- CREATE LINK CARD                          -->
+        <!-- ========================================== -->
+        <div class="create-card">
+            <h2><i class="fas fa-magic"></i> Create New Short Link</h2>
+            <p class="sub">Paste your long URL below to generate a short link</p>
+            <div class="form-group">
+                <input type="url" id="longUrl" placeholder="https://example.com/your-long-url" required>
+                <select id="expirySelect">
+                    <option value="never">Never Expires</option>
+                    <option value="7">Expires in 7 days</option>
+                    <option value="30">Expires in 30 days</option>
+                    <option value="90">Expires in 90 days</option>
+                </select>
+                <button class="btn-primary" id="shortenBtn">
+                    <i class="fas fa-bolt"></i> Generate Link
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- LINKS LIST - ONLY 5 SHOW                  -->
+        <!-- ========================================== -->
+        <div class="links-section">
+            <div class="links-header">
+                <h3><i class="fas fa-list"></i> Your Recent Links</h3>
+                <span class="badge" id="linksCount">0 links</span>
+            </div>
+            <div id="linksList" class="links-grid">
+                <!-- Links will be rendered here -->
+            </div>
+            <div class="view-all-link">
+                <a href="#" onclick="showAllLinks()">
+                    View All Links <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FOOTER                                     -->
+    <!-- ========================================== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="terms-and-condition.html"><i class="fas fa-file-contract"></i> Terms & Condition</a>
+                <a href="privacy-policy.html"><i class="fas fa-lock"></i> Privacy Policy</a>
+                <a href="#" onclick="showSupport()"><i class="fas fa-headset"></i> Contact</a>
+                <a href="about.html"><i class="fas fa-info-circle"></i> About Us</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 <a href="https://toonzi.xyz">TOONZI</a>. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- TOAST NOTIFICATION                         -->
+    <!-- ========================================== -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle success-icon"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FIREBASE & JAVASCRIPT                      -->
+    <!-- ========================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABekPzR4zxlY8rws16hyYNmFlMXBcggXk",
+            authDomain: "vansh-98953.firebaseapp.com",
+            projectId: "vansh-98953",
+            storageBucket: "vansh-98953.firebasestorage.app",
+            messagingSenderId: "784796743834",
+            appId: "1:784796743834:web:b4ca65fc00f6ce50ff0723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let allLinks = [];
+
+        // ============================================
+        // SIDEBAR
+        // ============================================
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+            document.body.style.overflow = document.getElementById('sidebar').classList.contains('active') ? 'hidden' : '';
+        };
+
+        // ============================================
+        // PROFILE DROPDOWN
+        // ============================================
+        window.toggleProfileDropdown = () => {
+            document.getElementById('profileDropdown').classList.toggle('show');
+        };
+
+        document.addEventListener('click', (e) => {
+            if (!document.querySelector('.profile-container')?.contains(e.target)) {
+                document.getElementById('profileDropdown').classList.remove('show');
+            }
+        });
+
+        // ============================================
+        // SHOW PROFILE DETAILS
+        // ============================================
+        window.showProfileDetails = () => {
+            if (!currentUser) return;
+            document.getElementById('profileDropdown').classList.remove('show');
+            
+            Swal.fire({
+                title: 'Profile Details',
+                html: `
+                    <div style="text-align:left;color:#64748b;font-size:14px;">
+                        <p><strong style="color:#0f172a;">Name:</strong> ${currentUser.displayName || currentUser.email.split('@')[0]}</p>
+                        <p><strong style="color:#0f172a;">Email:</strong> ${currentUser.email}</p>
+                        <p><strong style="color:#0f172a;">Email Verified:</strong> ${currentUser.emailVerified ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong style="color:#0f172a;">Member Since:</strong> ${new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        <p><strong style="color:#0f172a;">Total Links:</strong> ${allLinks.length}</p>
+                        <p><strong style="color:#0f172a;">Wallet Balance:</strong> $<span id="walletBalanceModal">0.00</span></p>
+                    </div>
+                `,
+                confirmButtonColor: '#0f172a',
+                width: '450px'
+            });
+        };
+
+        // ============================================
+        // SUPPORT
+        // ============================================
+        window.showSupport = () => {
+            Swal.fire({
+                title: 'TOONZI Support',
+                html: `
+                    <p style="text-align:left;color:#64748b;">
+                        <strong>📧 Email:</strong> vansh3725793@gmail.com<br>
+                        <strong>⏰ Response Time:</strong> Within 24 hours<br>
+                        <strong>📅 Support Days:</strong> Monday - Friday<br>
+                        <strong>🕐 Hours:</strong> 9:00 AM - 6:00 PM EST
+                    </p>
+                `,
+                confirmButtonColor: '#0f172a'
+            });
+        };
+
+        // ============================================
+        // VIEW ALL LINKS
+        // ============================================
+        window.showAllLinks = () => {
+            if (allLinks.length === 0) {
+                Swal.fire('No Links', 'You haven\'t created any links yet.', 'info');
+                return;
+            }
+            const linksList = allLinks.map((l, i) => 
+                `${i+1}. ${window.location.origin}/redirect.html?id=${l.shortId}`
+            ).join('\n');
+            Swal.fire({
+                title: 'All Your Links',
+                text: linksList,
+                confirmButtonColor: '#0f172a',
+                width: '600px'
+            });
+        };
+
+        // ============================================
+        // TOAST
+        // ============================================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============================================
+        // COPY TO CLIPBOARD
+        // ============================================
+        window.copyToClipboard = (text) => {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied: ' + text);
+            });
+        };
+
+        // ============================================
+        // DELETE LINK
+        // ============================================
+        window.deleteLink = async (id) => {
+            const conf = await Swal.fire({
+                title: 'Delete Link?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel'
+            });
+            if (conf.isConfirmed) {
+                await deleteDoc(doc(db, "links", id));
+                showToast('Link deleted successfully!');
+            }
+        };
+
+        // ============================================
+        // RENDER LINKS (Only 5)
+        // ============================================
+        function renderLinks(links) {
+            const container = document.getElementById('linksList');
+            const count = document.getElementById('linksCount');
+            
+            allLinks = links;
+            count.textContent = links.length + ' link' + (links.length !== 1 ? 's' : '');
+
+            const showLinks = links.slice(0, 5);
+
+            if (showLinks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-link"></i>
+                        <h3>No Links Yet</h3>
+                        <p>Create your first short link above</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = showLinks.map(link => {
+                const shortUrl = `${window.location.origin}/redirect.html?id=${link.shortId}`;
+                const active = !link.retracted && (!link.expiryDate || new Date(link.expiryDate) > new Date());
+                const clicks = link.clicks || 0;
+
+                return `
+                    <div class="link-card">
+                        <div class="link-url">
+                            <i class="fas fa-link"></i> ${shortUrl}
+                        </div>
+                        <div class="link-meta">
+                            <span class="clicks"><i class="fas fa-mouse-pointer"></i> ${clicks}</span>
+                            <span class="status ${active ? 'active' : 'inactive'}">${active ? 'Active' : 'Inactive'}</span>
+                            <div class="link-actions">
+                                <button class="copy-btn" onclick="event.stopPropagation();copyToClipboard('${shortUrl}')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="delete-btn" onclick="event.stopPropagation();deleteLink('${link.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // SHORTEN LINK
+        // ============================================
+        document.getElementById('shortenBtn').addEventListener('click', async function() {
+            const url = document.getElementById('longUrl').value.trim();
+            if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+                Swal.fire('Invalid URL', 'Please enter a valid URL starting with http:// or https://', 'warning');
+                return;
+            }
+
+            const sid = Math.random().toString(36).substring(2, 8);
+            const exp = document.getElementById('expirySelect').value;
+            let ed = null;
+            if (exp !== 'never') {
+                ed = new Date();
+                ed.setDate(ed.getDate() + parseInt(exp));
+            }
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            try {
+                await addDoc(collection(db, "links"), {
+                    userId: currentUser.uid,
+                    longUrl: url,
+                    shortId: sid,
+                    retracted: false,
+                    clicks: 0,
+                    createdAt: new Date().toISOString(),
+                    expiryDate: ed ? ed.toISOString() : null
+                });
+
+                document.getElementById('longUrl').value = '';
+                showToast('Link created: ' + sid);
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Link Created!',
+                    html: `<strong>${window.location.origin}/redirect.html?id=${sid}</strong>`,
+                    confirmButtonColor: '#0f172a'
+                });
+
+            } catch (error) {
+                Swal.fire('Error', 'Failed to create link. Please try again.', 'error');
+            }
+
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-bolt"></i> Generate Link';
+        });
+
+        // ============================================
+        // ENTER KEY SUPPORT
+        // ============================================
+        document.getElementById('longUrl').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('shortenBtn').click();
+            }
+        });
+
+        // ============================================
+        // UPDATE WALLET BALANCE
+        // ============================================
+        function updateWalletBalance(links) {
+            // Calculate earnings based on clicks (example: $0.001 per click)
+            let totalClicks = 0;
+            links.forEach(link => {
+                totalClicks += (link.clicks || 0);
+            });
+            const balance = totalClicks * 0.001; // $0.001 per click
+            document.getElementById('walletBalance').textContent = balance.toFixed(2);
+            
+            // Update modal balance if open
+            const modalBalance = document.getElementById('walletBalanceModal');
+            if (modalBalance) {
+                modalBalance.textContent = balance.toFixed(2);
+            }
+        }
+
+        // ============================================
+        // AUTH STATE & REAL-TIME LISTENER
+        // ============================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.emailVerified) {
+                currentUser = user;
+                const initial = user.email.charAt(0).toUpperCase();
+                document.getElementById('profileAvatar').textContent = initial;
+                document.getElementById('dropdownName').textContent = user.displayName || user.email.split('@')[0];
+                document.getElementById('dropdownEmail').textContent = user.email;
+
+                const q = query(
+                    collection(db, "links"),
+                    where("userId", "==", user.uid),
+                    orderBy("createdAt", "desc")
+                );
+
+                onSnapshot(q, (snap) => {
+                    const links = [];
+                    snap.forEach(d => {
+                        links.push({ id: d.id, ...d.data() });
+                    });
+                    renderLinks(links);
+                    updateWalletBalance(links);
+                });
+
+            } else if (user && !user.emailVerified) {
+                await Swal.fire({
+                    title: 'Email Not Verified',
+                    text: 'Please verify your email before accessing the dashboard.',
+                    icon: 'warning',
+                    confirmButtonColor: '#0f172a'
+                });
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.href = 'index.html';
+        });
+
+    </script>
+
+</body>
+</html>
